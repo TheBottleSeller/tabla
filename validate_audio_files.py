@@ -34,11 +34,9 @@ def is_valid_audio_filename(type, filename):
     parts = filename.split('_')
 
     if not len(parts) == 3:
-        print 'here1'
         return False
         
     if not parts[0] == type:
-        print type
         return False
     
     if (parts[1] != 'LLL' and
@@ -95,7 +93,7 @@ def verify_patient_dir(patient, last_seen_id):
     verify_type_dir(patient, "PS")
     verify_type_dir(patient, "TF")
 
-print "Validating %s study" % study
+print "VALIDATING AUDIO FOR %s STUDY" % study
 
 last_seen_id = 0
 for patient_dir in patient_dirs:
@@ -106,4 +104,4 @@ for patient_dir in patient_dirs:
         print(error)
     last_seen_id = last_seen_id + 1
     
-print "Done"
+print "DONE\n"
