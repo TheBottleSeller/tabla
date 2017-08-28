@@ -35,10 +35,10 @@ def is_valid_audio_filename(type, filename):
 
     if not len(parts) == 3:
         return False
-        
+
     if not parts[0] == type:
         return False
-    
+
     if (parts[1] != 'LLL' and
         parts[1] != 'LML' and
         parts[1] != 'LUL' and
@@ -57,8 +57,8 @@ def verify_type_dir(patient, type):
     type_dir = "%s/%s/%s" % (audio_file_path, patient, type)
     if not os.path.isdir(type_dir):
         return
-    
-    audio_files = [file for file in os.listdir(type_dir) if file != 'Icon\r']
+
+    audio_files = [file for file in os.listdir(type_dir) if file != 'Icon\r' and file != '.DS_Store']
 
     for file in audio_files:
         if not is_valid_audio_filename(type, file):
@@ -103,5 +103,5 @@ for patient_dir in patient_dirs:
         print('Failed validation patient %s' % patient_dir)
         print(error)
     last_seen_id = last_seen_id + 1
-    
+
 print "DONE\n"
