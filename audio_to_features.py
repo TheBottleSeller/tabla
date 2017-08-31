@@ -4,6 +4,9 @@ import os
 import sys
 import functools
 import numpy as np
+import math
+
+import features
 
 # parser = argparse.ArgumentParser(description='Validate pnuemonia audio files.')
 # parser.add_argument('--audio_file_path', type=str, help='file path to audio files')
@@ -50,10 +53,7 @@ stft = tf.contrib.signal.stft(
     name="STFT"
 )
 
-
-
 average_fft = tf.reduce_mean(tf.squeeze(stft), 0)
-
 
 # https://medium.com/towards-data-science/audio-processing-in-tensorflow-208f1a4103aa
 # magnitude spectrum of positive frequencies in dB
@@ -64,7 +64,7 @@ def log10(x):
     den = tf.log(tf.constant(10, dtype=num.dtype))
     return(tf.div(num, den))
 
-magnitude = 20 * log10(tf.maximum(abs_fft, 1E-06))
+magnitude = 20 * log10(abs_fft + 1)
 
 # def angle(z):
 #     if z.dtype == tf.complex128:
@@ -104,17 +104,15 @@ with tf.Session() as sess:
         audio_file: "/Users/neilbatlivala/Google Drive/Tabla/Pneumonia Study Data/PNA002/PS/PS_LLL_1.wav"
     })
 
-    # print sftfval
-    print m
-
-    # print sftfval.shape
-    # print output
+    spectrum = []
     file = open("fft.csv", "w")
 
     for i in range(m.shape[0]):
         # https://www.quora.com/How-do-I-convert-Complex-number-output-generated-by-FFT-algorithm-into-Frequency-vs-Amplitude
-        frequency = i * sample_rate / fft_length
+        frequency = i * math.ceil(sample_rate / fft_length)
+        spectrum.append([frequency, m[i]])
         file.write('%f,%f' % (frequency, m[i]))
         file.write(',\n')
-    # print stftval.length
+
+    print features.get_features_for_ps_spectrum(spectrum)
 print "done"
