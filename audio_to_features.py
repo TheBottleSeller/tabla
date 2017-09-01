@@ -8,25 +8,25 @@ import math
 
 import features
 
-# parser = argparse.ArgumentParser(description='Validate pnuemonia audio files.')
-# parser.add_argument('--audio_file_path', type=str, help='file path to audio files')
-# parser.add_argument('--study', type=str, help='ED or PNA')
-# args = parser.parse_args()
-#
-# study = args.study
-# audio_file_path = args.audio_file_path.rstrip('/')
-# if not audio_file_path:
-#     print('audio file path is required')
-#     sys.exit(-1)
-#
-# if not study == 'PNA' and not study == 'ED':
-#     print('study must be either PNA or ED')
-#     sys.exit(-1)
-#
-# patient_dirs = [file for file in os.listdir(audio_file_path) if file.startswith(study)]
-# patient_dirs.sort()
+parser = argparse.ArgumentParser(description='Validate pnuemonia audio files.')
+parser.add_argument('--audio_file_path', type=str, help='file path to audio files')
+parser.add_argument('--study', type=str, help='ED or PNA')
+args = parser.parse_args()
 
-# raw_binary_data=tf.placeholder(tf.)
+study = args.study
+audio_file_path = args.audio_file_path.rstrip('/')
+if not audio_file_path:
+    print('audio file path is required')
+    sys.exit(-1)
+
+if not study == 'PNA' and not study == 'ED':
+    print('study must be either PNA or ED')
+    sys.exit(-1)
+
+patient_dirs = [file for file in os.listdir(audio_file_path) if file.startswith(study)]
+patient_dirs.sort()
+
+# Tensorflow
 
 sample_rate = 4000
 frame_length = 512
@@ -64,31 +64,8 @@ def log10(x):
     den = tf.log(tf.constant(10, dtype=num.dtype))
     return(tf.div(num, den))
 
+# Add 1 to ensure all powers are greater than 0 (since taking log base 10)
 magnitude = 20 * log10(abs_fft + 1)
-
-# def angle(z):
-#     if z.dtype == tf.complex128:
-#         dtype = tf.float64
-#     elif z.dtype == tf.complex64:
-#         dtype = tf.float32
-#     else:
-#         raise ValueError('input z must be of type complex64 or complex128')
-#
-#     x = tf.real(z)
-#     y = tf.imag(z)
-#     x_neg = tf.cast(x < 0.0, dtype)
-#     y_neg = tf.cast(y < 0.0, dtype)
-#     y_pos = tf.cast(y >= 0.0, dtype)
-#     offset = x_neg * (y_pos - y_neg) * np.pi
-#     return tf.atan(y / x) + offset
-#
-# # phase of positive frequencies
-# phase = angle(average_fft)
-
-# fft = tf.cast(tf.spectral.fft(
-#     tf.cast(waveform, tf.complex64),
-#     name="FFT"
-# ), tf.float32)
 
 # Initializing the variables
 init = tf.global_variables_initializer()
@@ -97,22 +74,50 @@ init = tf.global_variables_initializer()
 with tf.Session() as sess:
     # from tensorflow.python import debug as tf_debug
     # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-
     sess.run(init)
 
-    [sftfval, output, m] = sess.run([stft, average_fft, magnitude], feed_dict={
-        audio_file: "/Users/neilbatlivala/Google Drive/Tabla/Pneumonia Study Data/PNA002/PS/PS_LLL_1.wav"
-    })
+    # Open file and create headers
+    file = open("features.csv", "w")
+    headers = ['patient id'] + features.get_feature_headers_for_ps_spectrum()
+    file.write(','.join(headers) + '\n')
 
-    spectrum = []
-    file = open("fft.csv", "w")
+    def get_frequency_spectrum(patient_id, type, region, trial):
+        [db_powers] = sess.run([magnitude], feed_dict={
+            audio_file: "%s/%s/%s/%s_%s_%d.wav" % (audio_file_path, patient_id, type, type, region, trial),
+        })
 
-    for i in range(m.shape[0]):
-        # https://www.quora.com/How-do-I-convert-Complex-number-output-generated-by-FFT-algorithm-into-Frequency-vs-Amplitude
-        frequency = i * math.ceil(sample_rate / fft_length)
-        spectrum.append([frequency, m[i]])
-        file.write('%f,%f' % (frequency, m[i]))
-        file.write(',\n')
+        freq_spectrum = []
+        for i in range(db_powers.shape[0]):
+            # https://www.quora.com/How-do-I-convert-Complex-number-output-generated-by-FFT-algorithm-into-Frequency-vs-Amplitude
+            frequency = i * math.ceil(sample_rate / fft_length)
+            freq_spectrum.append([frequency, db_powers[i]])
+        return freq_spectrum
 
-    print features.get_features_for_ps_spectrum(spectrum)
+    def get_average_frequency_spectrum(patient_id, type, region):
+        recordings_dir = "%s/%s/%s" % (audio_file_path, patient_id, type)
+        recordings = [file for file in os.listdir(recordings_dir) if file.startswith("%s_%s" % (type, region))]
+
+        freq_spectrums = []
+        for trial in range(1, len(recordings) + 1):
+            freq_spectrums.append(get_frequency_spectrum(patient_id, type, region, trial))
+
+        return np.mean(freq_spectrums, axis=0)
+
+    # Get features for single patient
+    def get_features(patient_id):
+        ps_spectrum = get_average_frequency_spectrum(patient_id, 'PS', 'LLL')
+        ps_features = features.get_features_for_ps_spectrum(ps_spectrum)
+
+        file.write('%s,' % patient_id)
+        for feature in ps_features:
+            file.write('%f,' % feature)
+        file.write('\n')
+
+    # Iterate through all patient data
+    for patient_dir in patient_dirs:
+        try:
+            get_features(patient_dir)
+        except Exception as error:
+            print('Failed generating features for patient %s' % patient_dir)
+            print(error)
 print "done"

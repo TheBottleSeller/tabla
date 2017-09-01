@@ -12,6 +12,9 @@ def get_features_for_spectrum(ps_spectrum, bs_spectrum, tf_spectrum):
         get_features_for_tf_spectrum(tf_spectrum),
     )
 
+def get_feature_headers_for_ps_spectrum():
+    return ['AUC 400Hz-100Hz', 'dB change 400Hz - 600Hz', 'dB change 100Hz - 200Hz']
+
 def get_features_for_ps_spectrum(spectrum):
     return np.array([
         get_area_under_curve(spectrum, 400, 1000),
