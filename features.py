@@ -13,7 +13,7 @@ def get_features_for_spectrum(ps_spectrum, bs_spectrum, tf_spectrum):
     )
 
 def get_feature_headers_for_ps_spectrum():
-    return ['AUC 400Hz-100Hz', 'dB change 400Hz - 600Hz', 'dB change 100Hz - 200Hz']
+    return ['PS - AUC 400Hz-100Hz', 'PS - db change 400Hz to 600Hz', 'PS - dB change 100Hz to 200Hz']
 
 def get_features_for_ps_spectrum(spectrum):
     return np.array([
@@ -22,11 +22,17 @@ def get_features_for_ps_spectrum(spectrum):
         get_power_change(spectrum, 100, 200),
     ])
 
+def get_feature_headers_for_bs_spectrum():
+    return ['BS - AUC 100 to 2500Hz', 'BS - Peak 300 to 500Hz']
+
 def get_features_for_bs_spectrum(spectrum):
     return np.array([
-        get_area_under_curve(spectrum, 100, 25000),
+        get_area_under_curve(spectrum, 100, 2500),
         peak_freq(spectrum, 300, 500),
     ])
+
+def get_feature_headers_for_tf_spectrum():
+    return ['TF - AUC 100 to 200Hz']
 
 def get_features_for_tf_spectrum(spectrum):
     return np.array([

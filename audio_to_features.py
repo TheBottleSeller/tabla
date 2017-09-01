@@ -6,7 +6,7 @@ import functools
 import numpy as np
 import math
 
-import features
+import features as fe
 
 parser = argparse.ArgumentParser(description='Validate pnuemonia audio files.')
 parser.add_argument('--audio_file_path', type=str, help='file path to audio files')
@@ -23,8 +23,8 @@ if not study == 'PNA' and not study == 'ED':
     print('study must be either PNA or ED')
     sys.exit(-1)
 
-patient_dirs = [file for file in os.listdir(audio_file_path) if file.startswith(study)]
-patient_dirs.sort()
+patient_ids = [file for file in os.listdir(audio_file_path) if file.startswith(study)]
+patient_ids.sort()
 
 # Tensorflow
 
@@ -76,9 +76,14 @@ with tf.Session() as sess:
     # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
     sess.run(init)
 
+    regions = ["LLL", "LML", "LUL", "RLL", "RML", "RUL"]
+
     # Open file and create headers
-    file = open("features.csv", "w")
-    headers = ['patient id'] + features.get_feature_headers_for_ps_spectrum()
+    file = open("audio_features.csv", "w")
+    headers = ['patient id'] + \
+        fe.get_feature_headers_for_ps_spectrum() + \
+        fe.get_feature_headers_for_bs_spectrum() + \
+        fe.get_feature_headers_for_tf_spectrum()
     file.write(','.join(headers) + '\n')
 
     def get_frequency_spectrum(patient_id, type, region, trial):
@@ -105,19 +110,29 @@ with tf.Session() as sess:
 
     # Get features for single patient
     def get_features(patient_id):
-        ps_spectrum = get_average_frequency_spectrum(patient_id, 'PS', 'LLL')
-        ps_features = features.get_features_for_ps_spectrum(ps_spectrum)
+        # PS features
+        ps_region_spectrums = [get_average_frequency_spectrum(patient_id, 'PS', region) for region in regions]
+        ps_region_features = [fe.get_features_for_ps_spectrum(spectrum) for spectrum in ps_region_spectrums]
+        ps_features = np.mean(ps_region_features, axis=0)
 
-        file.write('%s,' % patient_id)
-        for feature in ps_features:
-            file.write('%f,' % feature)
-        file.write('\n')
+        # BS features
+        bs_region_spectrums = [get_average_frequency_spectrum(patient_id, 'BS', region) for region in regions]
+        bs_region_features = [fe.get_features_for_bs_spectrum(spectrum) for spectrum in bs_region_spectrums]
+        bs_features = np.mean(bs_region_features, axis=0)
+
+        # TF features
+        tf_region_spectrums = [get_average_frequency_spectrum(patient_id, 'TF', region) for region in regions]
+        tf_region_features = [fe.get_features_for_tf_spectrum(spectrum) for spectrum in tf_region_spectrums]
+        tf_features = np.mean(tf_region_features, axis=0)
+
+        return np.concatenate([ps_features, bs_features, tf_features])
 
     # Iterate through all patient data
-    for patient_dir in patient_dirs:
-        try:
-            get_features(patient_dir)
-        except Exception as error:
-            print('Failed generating features for patient %s' % patient_dir)
-            print(error)
+    for patient_id in patient_ids:
+        features = get_features(patient_id)
+
+        file.write('%s,' % patient_id)
+        for feature in features:
+            file.write('%f,' % feature)
+        file.write('\n')
 print "done"
