@@ -80,7 +80,7 @@ with tf.Session() as sess:
 
     # Open file and create headers
     file = open("audio_features.csv", "w")
-    headers = ['patient id'] + \
+    headers = ['id'] + \
         fe.get_feature_headers_for_ps_spectrum() + \
         fe.get_feature_headers_for_bs_spectrum() + \
         fe.get_feature_headers_for_tf_spectrum()
