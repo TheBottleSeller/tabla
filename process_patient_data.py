@@ -6,6 +6,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='Processes patient data into mergeable csv')
 parser.add_argument('--patient_data', type=str, help='file path to patient data')
+parser.add_argument('--output', type=str, help='output file path')
 args = parser.parse_args()
 
 patient_data_path = args.patient_data
@@ -22,6 +23,16 @@ DEFAULT_BP_DIASTOLIC = 85
 DEFAULT_HR = 90
 DEFAULT_RR = 18
 
+KNOWN_BAD_IDS = [
+    'PNA001',
+    'PNA002',
+    'PNA003',
+    'PNA004',
+    'PNA005',
+    'PNA006',
+    'PNA007',
+]
+
 def default_thorax_circ(gender):
     if gender == 'M':
         return 80
@@ -33,14 +44,17 @@ def process_row(index):
     processed_row = np.array([])
 
     id = row_data[0]
+    if id in KNOWN_BAD_IDS:
+        return processed_row
+
     processed_row = np.append(processed_row, id)
 
-    # age = row_data[2]
-    # processed_row = np.append(processed_row, age)
+    age = row_data[2]
+    processed_row = np.append(processed_row, age)
 
     gender = row_data[3]
     if gender != 'M' and gender != 'F':
-        print 'Bad gender ' + gender
+        print 'Row %d: Bad gender: %s' % (index, gender)
         sys.exit(-1)
     processed_row = np.append(processed_row, 1 if gender == 'M' else 0)
     processed_row = np.append(processed_row, 1 if gender == 'F' else 0)
@@ -60,7 +74,7 @@ def process_row(index):
         temp = DEFAULT_TEMP
     processed_row = np.append(processed_row, temp)
 
-    bp = row_data[10], # 120/80
+    bp = row_data[10] # 120/80
     parts = bp.split('/')
     if len(parts) == 2 and isinstance(parts[0], int) and isinstance(parts[1], int):
         bp_systolic = parts[0]
@@ -97,18 +111,26 @@ def process_row(index):
     processed_row = np.append(processed_row, wheezing)
 
     #### PNEUMONIA OUTPUT ###
-    pneumonia = 0
+    lung_disease = 1
     diagnosis = row_data[19]
-    if diagnosis == 'Pneumonia':
-        pneumonia = 1
-    processed_row = np.append(processed_row, pneumonia)
+    if diagnosis == 'Healthy':
+        lung_disease = 0
+    processed_row = np.append(processed_row, lung_disease)
 
     return processed_row
 
 [rows, cols] = patient_data.shape
 
-output_data = np.array(['id', 'age', 'gender', 'thorax_circ', 'smoking_packs', 'temp', 'bp_systolic', 'bp_diastolic'])
-for row_index in range(1, rows):
-    output_data = np.vstack([output_data, process_row(row_index)])
+headers = ['id', 'age', 'male', 'female', 'thorax_circ', 'smoking_packs', 'temp', 'bp_systolic', 'bp_diastolic', 'hr', 'rr', 'sob', 'wheezing', 'lung_disease']
 
-print output_data
+output_data = np.array([])
+for row_index in range(2, rows):
+    next_row = process_row(row_index)
+    if next_row.size != 0:
+        if output_data.size == 0:
+            output_data = next_row
+        else:
+            output_data = np.vstack([output_data, next_row])
+df = pd.DataFrame(data=output_data, columns=headers)
+df.to_csv(args.output, index=False, line_terminator=',\n')
+# np.savetxt(args.output, output_data, delimiter=' ', header=','.join(headers))

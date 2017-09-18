@@ -4,7 +4,7 @@ import sys
 
 parser = argparse.ArgumentParser(description='Validate pnuemonia audio files.')
 parser.add_argument('--audio_file_path', type=str, help='file path to audio files')
-parser.add_argument('--study', type=str, help='ED or PNA')
+parser.add_argument('--study', type=str, help='ED, PNA, or HA')
 args = parser.parse_args()
 
 study = args.study
@@ -13,12 +13,17 @@ if not audio_file_path:
     print('audio file path is required')
     sys.exit(-1)
 
-if not study == 'PNA' and not study == 'ED':
-    print('study must be either PNA or ED')
+if not study == 'PNA' and not study == 'ED' and not study == 'HA':
+    print('study must be either PNA, ED, or HA')
     sys.exit(-1)
 
 patient_dirs = [file for file in os.listdir(audio_file_path) if file.startswith(study)]
 patient_dirs.sort()
+
+known_bad_patient_dirs = [
+    "PNA001",
+    "HA003",
+]
 
 def represents_int(s):
     try:
@@ -86,8 +91,7 @@ def verify_patient_dir(patient, last_seen_id):
     # Check not missing a patient data dir
     id = int(patient[len(study):])
     if not id == last_seen_id + 1:
-        print('Missing patient data %d' % (last_seen_id + 1))
-        sys.exit(-1)
+        raise Exception('Missing patient data %d' % (last_seen_id + 1))
 
     verify_type_dir(patient, "BS")
     verify_type_dir(patient, "PS")
@@ -100,8 +104,9 @@ for patient_dir in patient_dirs:
     try:
         verify_patient_dir(patient_dir, last_seen_id)
     except Exception as error:
-        print('Failed validation patient %s' % patient_dir)
-        print(error)
+        if not patient_dir in known_bad_patient_dirs:
+            print('Failed validation patient %s' % patient_dir)
+            print(error)
     last_seen_id = last_seen_id + 1
 
-print "DONE\n"
+print "DONE"
