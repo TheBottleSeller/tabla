@@ -19,7 +19,6 @@ n_hidden_2 = 256 # 2nd layer number of neurons
 num_input = 20 # input vector size
 num_classes = 1 # output classes
 
-
 # Define the neural network
 def neural_net(x_dict):
     # TF Estimator input is a dict, in case of multiple inputs

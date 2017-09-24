@@ -20,4 +20,4 @@ in1 = pd.read_csv(in1_path)
 in2 = pd.read_csv(in2_path)
 out = pd.concat([in1, in2], ignore_index=False)
 print out
-out.to_csv(output, index=True)
+out.to_csv(output, index=False)

@@ -22,7 +22,8 @@ patient_dirs.sort()
 
 known_bad_patient_dirs = [
     "PNA001",
-    "HA003",
+    "HA001",
+    "HA002",
 ]
 
 def represents_int(s):
@@ -107,6 +108,6 @@ for patient_dir in patient_dirs:
         if not patient_dir in known_bad_patient_dirs:
             print('Failed validation patient %s' % patient_dir)
             print(error)
-    last_seen_id = last_seen_id + 1
+    last_seen_id = int(patient_dir[len(study):])
 
 print "DONE"

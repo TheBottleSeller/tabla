@@ -27,4 +27,4 @@ print in2.index.tolist()
 print in1.columns
 print in2.columns
 merged = in2.merge(in1, on=merge_on, how="outer").fillna("")
-merged.to_csv(output, index=True)
+merged.to_csv(output, index=False)
