@@ -20,11 +20,7 @@ if not in1_path or not in2_path or not merge_on or not output:
 
 in1 = pd.read_csv(in1_path)
 in2 = pd.read_csv(in2_path)
-print in1.keys
-print in2.keys
-print in1.index.tolist()
-print in2.index.tolist()
-print in1.columns
-print in2.columns
-merged = in2.merge(in1, on=merge_on, how="outer").fillna("")
+merged = in2.merge(in1, on=merge_on, how="inner")
+merged.drop('id', axis=1, inplace=True)
+merged.drop(merged.columns[len(merged.columns)-1], axis=1, inplace=True)
 merged.to_csv(output, index=False)
