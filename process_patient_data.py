@@ -135,7 +135,7 @@ def process_row(index):
     #### PNEUMONIA OUTPUT ###
     lung_disease = 1
     diagnosis = row_data[20]
-    if diagnosis == 'Healthy':
+    if diagnosis == 'Healthy' or diagnosis == 'None':
         lung_disease = 0
     processed_row = np.append(processed_row, lung_disease)
 
