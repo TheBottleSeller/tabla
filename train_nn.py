@@ -1,6 +1,4 @@
-""" Tabla Neural Network.
-A 2-Hidden Layers Fully Connected Neural Network (a.k.a Multilayer Perceptron)
-implementation with TensorFlow.
+""" Tabla Neural Network
 """
 
 from __future__ import print_function
@@ -23,8 +21,8 @@ if not input:
 # Configurable network parameters
 training_epochs = 50
 learning_rate = 0.1
-n_hidden_1 = 8  # 1st layer number of neurons
-n_hidden_2 = 4  # 2nd layer number of neurons
+n_hidden_1 = 5  # 1st layer number of neurons
+n_hidden_2 = 3  # 2nd layer number of neurons
 test_percent = 0.1
 
 # Read the data
@@ -74,7 +72,9 @@ def neural_net():
 pred = neural_net()
 
 # Define loss and optimizer
+# TODO: weight the error of a false negative higher than a false positive
 loss_func = tf.nn.l2_loss(pred-y,name="squared_error_cost")
+
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
 error = optimizer.minimize(loss_func)
 
