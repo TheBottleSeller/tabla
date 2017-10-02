@@ -70,25 +70,32 @@ def neural_net():
 
 # Build the neural network
 pred = neural_net()
+# pred = tf.contrib.layers.flatten(pred)
+pred = tf.reshape(pred, tf.shape(y))
+
+diff = pred-y
 
 # Define loss and optimizer
 # TODO: weight the error of a false negative higher than a false positive
-loss_func = tf.nn.l2_loss(pred-y,name="squared_error_cost")
+# loss_func = tf.nn.l2_loss(diff, name="squared_error_cost")
+loss_func = tf.reduce_sum(diff * diff)
 
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
 error = optimizer.minimize(loss_func)
 
 # Launch the graph
+tf.logging.set_verbosity(tf.logging.INFO)
 init = tf.initialize_all_variables()
 with tf.Session() as sess:
-    sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+    # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
     sess.run(init)
 
     # Training cycle
     for epoch in range(training_epochs):
-        e = sess.run([error], feed_dict={
+        [p, d, e] = sess.run([pred, diff, error], feed_dict={
             x: x_train,
             y: y_train,
         })
-        print(e)
-        print("Epoch: %d. Error: %v" % (epoch, e))
+        print(p)
+        print(d)
+        print("Epoch: %d. Error: %d" % (epoch, e))
