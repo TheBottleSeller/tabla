@@ -1,14 +1,17 @@
-""" Tabla Neural Network
-"""
+"""Tabla Neural Network"""
 
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
+import numpy as np
 import tensorflow as tf
 import argparse
 import sys
 import pandas as pd
-import numpy as np
 import sklearn.model_selection as sk
+
+tf.logging.set_verbosity(tf.logging.INFO)
 
 parser = argparse.ArgumentParser(description='Neural network for pneumonia likelihood')
 parser.add_argument('--input', type=str, help='input file')
@@ -19,83 +22,128 @@ if not input:
     sys.exit(-1)
 
 # Configurable network parameters
-training_epochs = 50
+training_epochs = 100
 learning_rate = 0.1
 n_hidden_1 = 5  # 1st layer number of neurons
 n_hidden_2 = 3  # 2nd layer number of neurons
-test_percent = 0.1
+test_percent = 0.5
+diagnosis_threshold = 0.6
 
-# Read the data
-data = pd.read_csv(args.input, header=None)
-num_cols = len(data.columns)
+def nn_model_fn(features, labels, mode):
+  """Model function for NN."""
+  # Hidden fully connected layer
+  layer_1 = tf.layers.dense(features["x"], n_hidden_1)
 
-x_cols = range(0, num_cols - 1)
-y_cols = [num_cols - 1]
+  # Hidden fully connected layer
+  layer_2 = tf.layers.dense(layer_1, n_hidden_2)
 
-healthy_data = data.loc[data[num_cols - 1] == 0]
-healthy_data_xs = healthy_data.drop(labels=y_cols, axis=1)
-healthy_data_ys = healthy_data.drop(labels=x_cols, axis=1)
-healthy_x_train, healthy_x_test, healthy_y_train, healthy_y_test = \
-    sk.train_test_split(healthy_data_xs,healthy_data_ys,test_size=1, random_state = 42, shuffle=True)
+  # Use a sigmoid activiation function to get output from 0 to 1
+  diagnosis_probabilities = tf.layers.dense(layer_2, 1, activation=tf.nn.sigmoid, name="diagnosis_probabilities")
 
-sick_data = data.loc[data[num_cols - 1] == 1]
-sick_data_xs = sick_data.drop(labels=y_cols, axis=1)
-sick_data_ys = sick_data.drop(labels=x_cols, axis=1)
-sick_x_train, sick_x_test, sick_y_train, sick_y_test = \
-    sk.train_test_split(sick_data_xs,sick_data_ys,test_size=1, random_state = 42, shuffle=True)
+  diagnosis_pred_comparison = tf.greater(diagnosis_probabilities, tf.constant(diagnosis_threshold, dtype=tf.float64))
+  # diagnosis_0 =
+  # diagnosis_pred = tf.assign(diagnosis_probabilities, tf.where(diagnosis_pred_comparison, [1], [0]))
+  # diagnosis_pred = tf.assign(diagnosis_probabilities > 0.5, 1, 0)
+  diagnosis_pred = tf.where(diagnosis_pred_comparison,
+    tf.ones_like(diagnosis_probabilities, dtype=tf.float64),
+    tf.zeros_like(diagnosis_probabilities, dtype=tf.float64),
+    name="predictions"
+  )
 
-x_train = healthy_x_train.append(sick_x_train)
-x_test = healthy_x_test.append(sick_x_test)
-y_train = healthy_y_train.append(sick_y_train)
-y_test = healthy_y_test.append(sick_y_test)
+  predictions = {
+      # Generate predictions (for PREDICT and EVAL mode)
+      "diagnosis": diagnosis_pred,
+      "probabilities": diagnosis_probabilities
+  }
+  if mode == tf.estimator.ModeKeys.PREDICT:
+    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
-# Unconfigurable network parameters
-num_input = num_cols - 1   # input vector size, number of columns - 1 (last is output label)
-num_classes = 1                         # output classes (lung disease or not)
+  # Calculate Loss (for both TRAIN and EVAL modes)
+  diff = tf.subtract(labels, diagnosis_probabilities, name='diff')
+  # tf.Variable(labels, name='labels')
+  # tf.Variable(diff, name='diff')
+  # print(tf.global_variables())
+  loss = tf.reduce_sum(diff * diff)
 
-x = tf.placeholder("float", [None, num_input])
-y = tf.placeholder("float", [None, num_classes])
+  # Configure the Training Op (for TRAIN mode)
+  if mode == tf.estimator.ModeKeys.TRAIN:
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+    train_op = optimizer.minimize(
+        loss=loss,
+        global_step=tf.train.get_global_step())
+    return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 
-# Define the neural network
-def neural_net():
-    # Hidden fully connected layer
-    layer_1 = tf.layers.dense(x, n_hidden_1)
+  # Add evaluation metrics (for EVAL mode)
+  eval_metric_ops = {
+      "accuracy": tf.metrics.accuracy(
+        labels=labels, predictions=predictions["diagnosis"]
+      )
+  }
+  return tf.estimator.EstimatorSpec(
+      mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
-    # Hidden fully connected layer
-    layer_2 = tf.layers.dense(layer_1, n_hidden_2)
 
-    # Use a sigmoid activiation function to get output from 0 to 1
-    out_layer = tf.layers.dense(layer_2, num_classes, activation=tf.nn.sigmoid)
-    return out_layer
+def main(unused_argv):
+    # Load training and eval data
+    data = pd.read_csv(args.input, header=None)
+    num_cols = len(data.columns)
 
-# Build the neural network
-pred = neural_net()
-# pred = tf.contrib.layers.flatten(pred)
-pred = tf.reshape(pred, tf.shape(y))
+    x_cols = range(0, num_cols - 1)
+    y_cols = [num_cols - 1]
 
-diff = pred-y
+    healthy_data = data.loc[data[num_cols - 1] == 0]
+    healthy_data_xs = healthy_data.drop(labels=y_cols, axis=1)
+    healthy_data_ys = healthy_data.drop(labels=x_cols, axis=1)
+    healthy_x_train, healthy_x_test, healthy_y_train, healthy_y_test = \
+        sk.train_test_split(healthy_data_xs,healthy_data_ys,test_size=1, random_state = 42, shuffle=True)
 
-# Define loss and optimizer
-# TODO: weight the error of a false negative higher than a false positive
-# loss_func = tf.nn.l2_loss(diff, name="squared_error_cost")
-loss_func = tf.reduce_sum(diff * diff)
+    sick_data = data.loc[data[num_cols - 1] == 1]
+    sick_data_xs = sick_data.drop(labels=y_cols, axis=1)
+    sick_data_ys = sick_data.drop(labels=x_cols, axis=1)
+    sick_x_train, sick_x_test, sick_y_train, sick_y_test = \
+        sk.train_test_split(sick_data_xs,sick_data_ys,test_size=1, random_state = 42, shuffle=True)
 
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
-error = optimizer.minimize(loss_func)
+    x_train = healthy_x_train.append(sick_x_train).as_matrix()
+    x_test = healthy_x_test.append(sick_x_test).as_matrix()
+    y_train = healthy_y_train.append(sick_y_train).as_matrix()
+    y_test = healthy_y_test.append(sick_y_test).as_matrix()
 
-# Launch the graph
-tf.logging.set_verbosity(tf.logging.INFO)
-init = tf.initialize_all_variables()
-with tf.Session() as sess:
-    # sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-    sess.run(init)
+    # Create the Estimator
+    tabla_classifier = tf.estimator.Estimator(
+      model_fn=nn_model_fn, model_dir="./tabla_nn_model")
 
-    # Training cycle
-    for epoch in range(training_epochs):
-        [p, d, e] = sess.run([pred, diff, error], feed_dict={
-            x: x_train,
-            y: y_train,
-        })
-        print(p)
-        print(d)
-        print("Epoch: %d. Error: %d" % (epoch, e))
+    # Set up logging for predictions
+    # Log the values in the "diagnosis_probabilities" tensor with label "probabilities"
+    tensors_to_log = {
+        "probabilities": "diagnosis_probabilities/Sigmoid",
+        # "predictions": "predictions",
+        # "diff": "diff"
+    }
+    logging_hook = tf.train.LoggingTensorHook(
+      tensors=tensors_to_log, every_n_iter=5)
+
+    # Train the model
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": x_train},
+      y=y_train,
+      batch_size=x_train.shape[0],
+      num_epochs=training_epochs,
+      shuffle=True
+    )
+    tabla_classifier.train(
+      input_fn=train_input_fn,
+      hooks=[logging_hook]
+    )
+
+    # Evaluate the model and print results
+    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": x_test},
+      y=y_test,
+      num_epochs=1,
+      shuffle=False
+    )
+    eval_results = tabla_classifier.evaluate(input_fn=eval_input_fn)
+    print(eval_results)
+
+if __name__ == "__main__":
+  tf.app.run()
