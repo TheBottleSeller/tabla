@@ -13,13 +13,15 @@ def get_features_for_spectrum(ps_spectrum, bs_spectrum, tf_spectrum):
     )
 
 def get_feature_headers_for_ps_spectrum():
-    return ['PS - AUC 400Hz-100Hz', 'PS - db change 400Hz to 600Hz', 'PS - dB change 100Hz to 200Hz']
+    return ['PS - AUC 400Hz-100Hz', 'PS - db increase 400Hz to 600Hz', 'PS - db decrease 400Hz to 600Hz', 'PS - dB change 100Hz to 200Hz', 'PS - db increase 200Hz to 400Hz']
 
 def get_features_for_ps_spectrum(spectrum):
     return np.array([
         get_area_under_curve(spectrum, 400, 1000),
         get_power_change(spectrum, 400, 600),
+        get_power_change(spectrum, 600, 400),
         get_power_change(spectrum, 100, 200),
+        get_power_change(spectrum, 200, 400),
     ])
 
 def get_feature_headers_for_bs_spectrum():

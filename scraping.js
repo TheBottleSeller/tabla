@@ -15,13 +15,13 @@ var scrapeAudio = function() {
 
   rows.sort(function(row1, row2) {
     if (row1.id < row2.id) {
-      return -1
-    } else {
       return 1
+    } else {
+      return -1
     }
   })
 
-  var rowToFilename = [
+  var recordings = [
     "TF/TF_RLL_1.wav",
     "TF/TF_LLL_1.wav",
     "TF/TF_RML_1.wav",
@@ -66,38 +66,69 @@ var scrapeAudio = function() {
     "PS/PS_LUL_1.wav",
   ];
 
-  var cmds = [
-    "mkdir BS; mkdir PS; mkdir TF;"
-  ];
+  var urls = [];
 
-  var generateCmd = function(i) {
-    if (i === 42) {
-      console.log(cmds)
-      var script = cmds.join("\n") + "\n";
-      script
-      console.log(script);
-      return;
+  var urlToCommand = function(i) {
+    return "sleep 2; curl -o " + recordings[i] + " \"" + urls[i] + "\";";
+  }
+
+  var generateScript = function() {
+    if (urls.length !== recordings.length) {
+      console.log("FAILURE! Incorrect number of urls found: " + urls.length);
+      return
+    }
+
+    for (var i = 0; i < recordings.length; i++) {
+      if (!urls[i]) {
+        console.log("FAILURE! Missing url for file " + recordings[i]);
+        console.log("index: " + i);
+        return
+      }
+      for (var j = i + 1; j < recordings.length; j++) {
+        if (urls[i] === urls[j]) {
+          console.log("FAILURE! Duplicate urls found for " + recordings[i] + " and " + recordings[j]);
+          console.log("index: " + i + " and " + j);
+          return
+        }
+      }
+    }
+
+    var cmds = [
+      "mkdir BS; mkdir PS; mkdir TF;"
+    ];
+    for (var i = 0; i < recordings.length; i++) {
+      cmds.push(urlToCommand(i));
+    }
+
+    console.log(cmds)
+    var script = cmds.join("\n") + "\n";
+    console.log("!!!!SUCCESS!!!");
+    console.log(script);
+  }
+
+  var scrapeAudioUrls = function(i) {
+    var DELAY = 3000;
+
+    if (i === recordings.length) {
+      return generateScript();
     }
     var audioUrl = "https://dashboard.ekodevices.com/#/dashboard/recordings/" + rows[i].id;
     if (window.location.href !== audioUrl) {
       window.location.href = audioUrl;
-      return setTimeout(function() { generateCmd(i) }, 3000)
+      return setTimeout(function() { scrapeAudioUrls(i) }, DELAY)
     }
     var downloadElement = document.getElementById('download-sound-td')
     if (!downloadElement) {
-      return setTimeout(function() { generateCmd(i) }, 3000)
+      return setTimeout(function() { scrapeAudioUrls(i) }, DELAY)
     }
     if (!downloadElement.children[0].href) {
-      return setTimeout(function() { generateCmd(i) }, 3000)
+      return setTimeout(function() { scrapeAudioUrls(i) }, DELAY)
     }
 
-    var url = "\"" + downloadElement.children[0].href + "\"";
-    var filename = rowToFilename[i]
-    var cmd = "sleep 1; curl -o " + filename + " " + url + ";"
-    cmds.push(cmd)
-    console.log(cmd)
-    generateCmd(i + 1)
+    urls.push(downloadElement.children[0].href)
+
+    scrapeAudioUrls(i + 1)
   }
 
-  generateCmd(0);
+  scrapeAudioUrls(0);
 }

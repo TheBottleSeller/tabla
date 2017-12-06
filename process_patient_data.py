@@ -31,8 +31,7 @@ KNOWN_BAD_IDS = [
     'PNA005',
     'PNA006',
     'PNA007',
-    'ED006',
-    'ED007',
+    'ED008',
 ]
 
 def default_thorax_circ(gender):
