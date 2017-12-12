@@ -5,6 +5,9 @@ import sys
 import functools
 import numpy as np
 import math
+# from pylab import *
+# import matplotlib
+# import matplotlib.pyplot as plt
 
 import features as fe
 
@@ -21,6 +24,7 @@ if not audio_file_path:
     print('audio file path is required')
     sys.exit(-1)
 
+study="PNA"
 if not study == 'PNA' and not study == 'ED' and not study == 'HA':
     print('study must be either PNA or ED or HA')
     sys.exit(-1)
@@ -113,10 +117,35 @@ with tf.Session() as sess:
 
         return np.mean(freq_spectrums, axis=0)
 
+    def write_region_spectrum_points(patient_id, spectra):
+        f = open("%s.csv" % (patient_id), "w")
+        h = ['frequency'] + regions
+        f.write(','.join(h) + '\n')
+        for i in range(0, len(spectra[0])):
+            f.write('%f,' % spectra[0][i][0])
+            for j in range(0, len(regions)):
+                f.write('%f,' % spectra[j][i][1])
+            f.write('\n')
+        f.close()
+
+        # matplotlib.use('Agg')
+        #
+        # frequencies = spectra[0][:,0]
+        # plt.plot(frequencies, spectra[0][:,1])
+        # xlabel('frequencies')
+        # ylabel('magnitude')
+        # grid(True)
+        # plt.savefig('myfig')
+        # show()
+
     # Get features for single patient
     def get_features(patient_id):
         # PS features
         ps_region_spectrums = [get_average_frequency_spectrum(patient_id, 'PS', region) for region in regions]
+        write_region_spectrum_points(patient_id, ps_region_spectrums)
+        # print ps_region_spectrums
+
+        return
         ps_region_features = [fe.get_features_for_ps_spectrum(spectrum) for spectrum in ps_region_spectrums]
         ps_features = np.mean(ps_region_features, axis=0)
 
@@ -133,13 +162,16 @@ with tf.Session() as sess:
         return np.concatenate([ps_features, bs_features, tf_features])
 
     # Iterate through all patient data
-    for patient_id in patient_ids:
-        features = get_features(patient_id)
+    for patient_id in ["PNA002", "PNA005", "PNA006", "ED002", "ED004", "ED006", "ED007", "HA003", "HA004", "HA005", "HA006", "HA007", "HA008"]:
+        try:
+            features = get_features(patient_id)
+        except:
+            # do nothing
+            print 'something'
 
-        file.write('%s,' % patient_id)
-        for feature in features[:-1]:
-            file.write('%f,' % feature)
-        file.write('%f' % features[-1])
-
-        file.write('\n')
-print "done"
+        # file.write('%s,' % patient_id)
+        # for feature in features[:-1]:
+        #     file.write('%f,' % feature)
+        # file.write('%f' % features[-1])
+        #
+        # file.write('\n')
