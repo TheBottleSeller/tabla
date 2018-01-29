@@ -1,4 +1,7 @@
-var scrapeAudio = function() {
+var scrapeAudio = function(patientId) {
+  if (!patientId) {
+    patientId = "PATIENT_DATA_RENAME_ME"
+  }
   var oddRows = document.getElementsByClassName('odd');
   var evenRows = document.getElementsByClassName('even');
 
@@ -93,16 +96,21 @@ var scrapeAudio = function() {
       }
     }
 
+    function wrapCommand(cmd) {
+      return "echo \"" + cmd.replace(/"/g, "\\\"") + "\" >> download.sh";    
+    }
     var cmds = [
-      "mkdir BS; mkdir PS; mkdir TF;"
+      wrapCommand("cd ~/Desktop; rm download.sh; mkdir " + patientId + "; cd " + patientId),
+      wrapCommand("mkdir BS; mkdir PS; mkdir TF;")
     ];
     for (var i = 0; i < recordings.length; i++) {
-      cmds.push(urlToCommand(i));
+      cmds.push(wrapCommand(urlToCommand(i)));
     }
-
-    console.log(cmds)
+    cmds.push(wrapCommand("open ../"))
+    cmds.push("bash download.sh")
     var script = cmds.join("\n") + "\n";
-    console.log("!!!!SUCCESS!!!");
+    
+    console.log("Success! Open your terminal, and copy and paste the entire script below:");
     console.log(script);
   }
 
