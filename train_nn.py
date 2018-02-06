@@ -41,9 +41,6 @@ def nn_model_fn(features, labels, mode):
   diagnosis_probabilities = tf.layers.dense(layer_2, 1, activation=tf.nn.sigmoid, name="diagnosis_probabilities")
 
   diagnosis_pred_comparison = tf.greater(diagnosis_probabilities, tf.constant(diagnosis_threshold, dtype=tf.float64))
-  # diagnosis_0 =
-  # diagnosis_pred = tf.assign(diagnosis_probabilities, tf.where(diagnosis_pred_comparison, [1], [0]))
-  # diagnosis_pred = tf.assign(diagnosis_probabilities > 0.5, 1, 0)
   diagnosis_pred = tf.where(diagnosis_pred_comparison,
     tf.ones_like(diagnosis_probabilities, dtype=tf.float64),
     tf.zeros_like(diagnosis_probabilities, dtype=tf.float64),
@@ -60,9 +57,6 @@ def nn_model_fn(features, labels, mode):
 
   # Calculate Loss (for both TRAIN and EVAL modes)
   diff = tf.subtract(labels, diagnosis_probabilities, name='diff')
-  # tf.Variable(labels, name='labels')
-  # tf.Variable(diff, name='diff')
-  # print(tf.global_variables())
   loss = tf.reduce_sum(diff * diff)
 
   # Configure the Training Op (for TRAIN mode)
