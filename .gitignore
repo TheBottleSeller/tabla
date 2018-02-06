@@ -2,4 +2,6 @@
 .Python
 *.pyc
 *.csv
+.DS_Store
+*.o
 tabla_nn_model
