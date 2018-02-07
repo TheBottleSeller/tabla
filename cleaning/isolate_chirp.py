@@ -114,19 +114,22 @@ def find_chirp_end_ms_sinusoidal_model():
 
     return frmTime[max_i] * 1000
 
-# The chirp lasts exactly 14 seconds
-# we need to make sure we capture all of it
-# If procedure missed some parts of the beginning of the chirp
-# that is ok, but we need to account for that
+def process_audio(in, out):
+    # The chirp lasts exactly 14 seconds
+    # we need to make sure we capture all of it
+    # If procedure missed some parts of the beginning of the chirp
+    # that is ok, but we need to account for that
 
-# end_of_chirp_ms = ceil(find_chirp_end_ms_odf())
-end_of_chirp_ms = ceil(find_chirp_end_ms_sinusoidal_model())
-start_of_chirp_ms = floor(max(0, end_of_chirp_ms - 14000))
+    # end_of_chirp_ms = ceil(find_chirp_end_ms_odf())
+    end_of_chirp_ms = ceil(find_chirp_end_ms_sinusoidal_model())
+    start_of_chirp_ms = floor(max(0, end_of_chirp_ms - 14000))
 
-chirp = AudioSegment.from_wav(input_path)
-print "Trimming audio: %.2fs - %.2fs" % (start_of_chirp_ms/1000, end_of_chirp_ms/1000)
-isolated_chirp = chirp[start_of_chirp_ms:end_of_chirp_ms]
-print "Fading audio: %dms" % fade_ms
-faded_chirp = isolated_chirp.fade_in(fade_ms).fade_out(fade_ms)
+    chirp = AudioSegment.from_wav(input_path)
+    print "Trimming audio: %.2fs - %.2fs" % (start_of_chirp_ms/1000, end_of_chirp_ms/1000)
+    isolated_chirp = chirp[start_of_chirp_ms:end_of_chirp_ms]
+    print "Fading audio: %dms" % fade_ms
+    faded_chirp = isolated_chirp.fade_in(fade_ms).fade_out(fade_ms)
 
-faded_chirp.export(output_path, format='wav')
+    faded_chirp.export(output_path, format='wav')
+
+process_audio(input_path, output_path)
