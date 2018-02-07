@@ -1,0 +1,3 @@
+chirp_1.wav = 0s - 12.873s
+chirp_2.wav = 0s - 12.939s
+ 
