@@ -130,5 +130,6 @@ def process_audio(type, input_path, output_path):
         audio = audio[start_of_chirp_ms:end_of_chirp_ms]
 
     print "- fading: %dms" % fade_time_ms
-    faded_audio = audio.fade_in(fade_time_ms).fade_out(fade_time_ms)
-    faded_audio.export(output_path, format='wav')
+    audio = audio.fade_in(fade_time_ms).fade_out(fade_time_ms)
+    audio.export(output_path, format='wav')
+    print "Processed audio: %s" % output_path

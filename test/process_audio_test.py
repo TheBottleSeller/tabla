@@ -1,13 +1,11 @@
-import argparse
 import sys
 
 sys.path.append('../')
 sys.path.append('../tools')
 from process_audio import process_audio
 
-parser = argparse.ArgumentParser(description='Clean audio file')
-parser.add_argument('--input', type=str, help='input file')
-parser.add_argument('--output', type=str, help='output file')
-args = parser.parse_args()
-
-process_audio('PS', 'ED_003_PS_LLL_1.wav', 'processed_chirp.wav')
+process_audio(
+    'PS',
+    '../raw_data/heart_failure/HF001/HF001_011918/PS/PS_LLL_2.wav',
+    '../processed_data/heart_failure/HF001/HF001_011918/PS/PS_LLL_2.wav'
+)
