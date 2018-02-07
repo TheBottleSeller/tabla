@@ -2,6 +2,7 @@
 
 ## Setup
 ```
+pip install -r requirements.txt
 cd tools/utilFunctions_C
 python compileModule.py build_ext --inplace
 ```
