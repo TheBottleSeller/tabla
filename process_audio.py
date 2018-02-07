@@ -8,7 +8,7 @@ import argparse
 from pydub import AudioSegment
 from math import floor, ceil
 
-sys.path.insert(0, './tools')
+sys.path.append('./tools')
 import stft
 import utilFunctions as UF
 import sineModel as SM
@@ -20,7 +20,7 @@ M = 961 # (integer): analysis window size (odd integer value)
 N = 2048 # (integer): fft size (power of two, bigger or equal than than M)
 H = 128 # (integer): hop size for the STFT computation
 
-def find_chirp_end_ms_odf():
+def find_chirp_end_ms_odf(input_path):
     def dB2energydB(mdB):
         m = 10 ** (mdB / 20.)
         energy_ = m ** 2.
@@ -72,7 +72,7 @@ def find_chirp_end_ms_odf():
     end_of_chirp = audioLength * timePercent
     return end_of_chirp * 1000
 
-def find_chirp_end_ms_sinusoidal_model():
+def find_chirp_end_ms_sinusoidal_model(input_path):
     window = 'blackmanharris'
     M = 401
     N = 2048
@@ -112,22 +112,23 @@ def process_audio(type, input_path, output_path):
     if type != 'PS' and type != 'BS' and type != 'TF':
         raise Exception('invalid type: %s' % type)
 
+    print "Processing audio: %s" % input_path
     audio = AudioSegment.from_wav(input_path)
     if type == 'PS':
             # The chirp lasts exactly 14 seconds
             # we need to make sure we capture all of it
             # If procedure missed some parts of the beginning of the chirp
             # that is ok, but we need to account for that
-        end_of_chirp_ms = ceil(find_chirp_end_ms_sinusoidal_model())
+        end_of_chirp_ms = ceil(find_chirp_end_ms_sinusoidal_model(input_path))
         start_of_chirp_ms = floor(max(0, end_of_chirp_ms - 14000))
 
         # If end chirp is less than 10s, throw an error
         if end_of_chirp_ms < 10000:
             raise Exception('End time for chirp in audio file %s is less than 10s: %dms!!!' % (input_path, end_of_chirp_ms))
 
-        print "Trimming audio: %.2fs - %.2fs" % (start_of_chirp_ms/1000, end_of_chirp_ms/1000)
+        print "- trimming: %.2fs - %.2fs" % (start_of_chirp_ms/1000, end_of_chirp_ms/1000)
         audio = audio[start_of_chirp_ms:end_of_chirp_ms]
 
-    print "Fading audio: %dms" % fade_time_ms
+    print "- fading: %dms" % fade_time_ms
     faded_audio = audio.fade_in(fade_time_ms).fade_out(fade_time_ms)
     faded_audio.export(output_path, format='wav')
