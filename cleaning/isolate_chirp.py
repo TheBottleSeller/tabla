@@ -6,9 +6,12 @@ import math
 import matplotlib.pyplot as plt
 import argparse
 from pydub import AudioSegment
+from math import floor, ceil
 sys.path.insert(0, '../tools')
 import stft
 import utilFunctions as UF
+
+fade_ms = 500
 
 window = 'blackman' # analysis window type (choice of rectangular, triangular, hanning, hamming, blackman, blackmanharris)
 M = 961 # (integer): analysis window size (odd integer value)
@@ -16,12 +19,13 @@ N = 2048 # (integer): fft size (power of two, bigger or equal than than M)
 H = 128 # (integer): hop size for the STFT computation
 
 parser = argparse.ArgumentParser(description='Clean audio file')
-parser.add_argument('--in', type=str, help='input file')
-parser.add_argument('--out', type=str, help='output file')
-input_path = args.in
-output_path = args.out
+parser.add_argument('--input', type=str, help='input file')
+parser.add_argument('--output', type=str, help='output file')
+args = parser.parse_args()
+input_path = args.input
+output_path = args.output
 
-def findChirpEnd(inputFile):
+def findChirpEnd():
     def dB2energydB(mdB):
         m = 10 ** (mdB / 20.)
         energy_ = m ** 2.
@@ -29,7 +33,7 @@ def findChirpEnd(inputFile):
         energy_ = 10 * np.log10(np.sum(energy_))
         return energy_
 
-    (fs, x) = UF.wavread(inputFile)
+    (fs, x) = UF.wavread(input_path)
     w = get_window(window, M)
     xmX, xpX = stft.stftAnal(x, w, N, H)
     numFrames = int(xmX[:,0].size) #Get number of frames (time slices)
@@ -77,13 +81,13 @@ def findChirpEnd(inputFile):
 # we need to make sure we capture all of it
 # If procedure missed some parts of the beginning of the chirp
 # that is ok, but we need to account for that
-end_of_chirp = findChirpEnd(input_path, 'blackman', 961, 2048, 128)
-start_of_chirp = max(0, end_of_chirp - 14.0)
-
-# Round to milliseconds
-start_ms = format(start_of_chirp, '.2f')
-end_ms = format(end_of_chirp, '.2f')
+end_of_chirp_ms = ceil(findChirpEnd() * 1000)
+start_of_chirp_ms = floor(max(0, end_of_chirp_ms - 14000) * 1000)
 
 chirp = AudioSegment.from_wav(input_path)
-isolated_chirp = chirp[start_ms:end_ms]
-faded_chirp = isolated_chirp.fade_in(2000).fade_out(3000)
+print "Trimming audio: %.2fs - %.2fs" % (start_of_chirp_ms/1000, end_of_chirp_ms/1000)
+isolated_chirp = chirp[start_of_chirp_ms:end_of_chirp_ms]
+print "Fading audio: %dms" % fade_ms
+faded_chirp = isolated_chirp.fade_in(fade_ms).fade_out(fade_ms)
+
+faded_chirp.export(output_path, format='wav')
