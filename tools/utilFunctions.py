@@ -19,8 +19,8 @@ except ImportError:
 	print ("-------------------------------------------------------------------------------")
 	print ("\n")
 	sys.exit(0)
-
-winsound_imported = False
+	
+winsound_imported = False	
 if sys.platform == "win32":
 	try:
 		import winsound
@@ -54,8 +54,8 @@ def wavread(filename):
 	if (len(x.shape) !=1):                                   # raise error if more than one channel
 		raise ValueError("Audio file should be mono")
 
-	# if (fs !=44100):                                         # raise error if more than one channel
-	# 	raise ValueError("Sampling rate of input sound should be 44100")
+	#if (fs !=44100):                                         # raise error if more than one channel
+	#	raise ValueError("Sampling rate of input sound should be 44100")
 
 	#scale down and convert audio into floating point number in range of -1 to 1
 	x = np.float32(x)/norm_fact[x.dtype.name]
@@ -402,3 +402,8 @@ def stochasticResidualAnal(x, N, H, sfreq, smag, sphase, fs, stocf):
 			stocEnv = np.vstack((stocEnv, np.array([mXrenv])))
 		pin += H                                            # advance sound pointer
 	return stocEnv
+
+
+
+
+
