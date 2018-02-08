@@ -3,7 +3,7 @@ import sys
 import numpy as np
 from scipy.signal import get_window
 import math
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import argparse
 from pydub import AudioSegment
 from math import floor, ceil
@@ -93,8 +93,16 @@ def find_chirp_end_ms_sinusoidal_model(input_path):
     frmTime = H*np.arange(numFrames)/float(fs)
 
     tfreq[tfreq<=0] = 0
+
     # tfreq[tfreq<=0] = np.nan
+    # xmX, xpX = stft.stftAnal(x, w, N, H)
+    #
+    # plt.figure(1, figsize=(9.5, 6))
     # plt.plot(frmTime, tfreq)
+    # binFreq = np.arange(N/2+1)*float(fs)/N
+    # plt.pcolormesh(frmTime, binFreq, np.transpose(xmX))
+    # plt.title('mX (piano.wav), M=1001, N=1024, H=256')
+    # plt.autoscale(tight=True)
     # plt.show()
 
     max = 0
@@ -106,7 +114,13 @@ def find_chirp_end_ms_sinusoidal_model(input_path):
             max = sine_max
             max_i = i
 
-    return frmTime[max_i] * 1000
+    end_of_chirp_ms = frmTime[max_i] * 1000
+
+    # calculate the amount of missing frequency at the
+    # end of the chirp to add that time back in
+    missingFreq = 1000 - maxFreq
+    time_fix_ms = 14 / 1000 * missingFreq * 1000
+    return end_of_chirp_ms + time_fix_ms
 
 def process_audio(type, input_path, output_path):
     if type != 'PS' and type != 'BS' and type != 'TF':
