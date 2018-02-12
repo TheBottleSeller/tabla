@@ -2,6 +2,7 @@ import sys
 import os
 import traceback
 import logging
+sys.path.append('./processed_data')
 from process_audio import process_audio
 
 in_root = 'raw_data'
