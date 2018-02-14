@@ -135,6 +135,7 @@ def process_audio_features(study, input, output_file):
     for patient_id in patient_ids:
         try:
             features = get_features(patient_id)
+            print features
             output_file.write('%s,' % patient_id)
             for feature in features[:-1]:
                 output_file.write('%f,' % feature)

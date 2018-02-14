@@ -1,0 +1,129 @@
+(.env) Neils-MacBook-Pro-2:tabla nbatlivala$ python run_process_audio.py 
+Processing audio: raw_data/heart_failure/HF003/HF003_012918/PS/PS_RLL_1.wav
+Decoding failed. ffmpeg returned error code: 1
+
+Output from ffmpeg/avlib:
+
+ffmpeg version 3.4.1 Copyright (c) 2000-2017 the FFmpeg developers
+  built with Apple LLVM version 9.0.0 (clang-900.0.39.2)
+  configuration: --prefix=/usr/local/Cellar/ffmpeg/3.4.1 --enable-shared --enable-pthreads --enable-version3 --enable-hardcoded-tables --enable-avresample --cc=clang --host-cflags= --host-ldflags= --enable-gpl --enable-ffplay --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --enable-opencl --enable-videotoolbox --disable-lzma
+  libavutil      55. 78.100 / 55. 78.100
+  libavcodec     57.107.100 / 57.107.100
+  libavformat    57. 83.100 / 57. 83.100
+  libavdevice    57. 10.100 / 57. 10.100
+  libavfilter     6.107.100 /  6.107.100
+  libavresample   3.  7.  0 /  3.  7.  0
+  libswscale      4.  8.100 /  4.  8.100
+  libswresample   2.  9.100 /  2.  9.100
+  libpostproc    54.  7.100 / 54.  7.100
+[wav @ 0x7f87b4800000] invalid start code [60]htm in RIFF header
+/var/folders/_s/jl4m8tz10sz232qh4wmgg8840000gn/T/tmpJ39eE4: Invalid data found when processing input
+
+!!!!!!!!!!!!!
+Failed processing: raw_data/heart_failure/HF003/HF003_012918/PS/PS_RLL_1.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/heart_failure/HF004/HF004_013018/PS/PS_LLL_3.wav
+End time for chirp in audio file raw_data/heart_failure/HF004/HF004_013018/PS/PS_LLL_3.wav is less than 10s: 9013ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/heart_failure/HF004/HF004_013018/PS/PS_LLL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/heart_failure/HF001/HF001_011918/PS/PS_LUL_3.wav
+End time for chirp in audio file raw_data/heart_failure/HF001/HF001_011918/PS/PS_LUL_3.wav is less than 10s: 6150ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/heart_failure/HF001/HF001_011918/PS/PS_LUL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA007/PS/PS_RLL_2.wav
+End time for chirp in audio file raw_data/healthy/HA007/PS/PS_RLL_2.wav is less than 10s: 9738ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA007/PS/PS_RLL_2.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA007/PS/PS_LLL_3.wav
+End time for chirp in audio file raw_data/healthy/HA007/PS/PS_LLL_3.wav is less than 10s: 7013ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA007/PS/PS_LLL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA007/PS/PS_LLL_2.wav
+End time for chirp in audio file raw_data/healthy/HA007/PS/PS_LLL_2.wav is less than 10s: 8288ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA007/PS/PS_LLL_2.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA008/PS/PS_LLL_1.wav
+End time for chirp in audio file raw_data/healthy/HA008/PS/PS_LLL_1.wav is less than 10s: 4450ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA008/PS/PS_LLL_1.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA008/PS/PS_LLL_2.wav
+End time for chirp in audio file raw_data/healthy/HA008/PS/PS_LLL_2.wav is less than 10s: 6288ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA008/PS/PS_LLL_2.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA006/PS/PS_RML_1.wav
+End time for chirp in audio file raw_data/healthy/HA006/PS/PS_RML_1.wav is less than 10s: 9613ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_1.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA006/PS/PS_RML_2.wav
+End time for chirp in audio file raw_data/healthy/HA006/PS/PS_RML_2.wav is less than 10s: 9250ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_2.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA006/PS/PS_RML_3.wav
+End time for chirp in audio file raw_data/healthy/HA006/PS/PS_RML_3.wav is less than 10s: 8013ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA004/PS/PS_LLL_3.wav
+End time for chirp in audio file raw_data/healthy/HA004/PS/PS_LLL_3.wav is less than 10s: 9050ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA004/PS/PS_LLL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA003/PS/PS_LML_2.wav
+End time for chirp in audio file raw_data/healthy/HA003/PS/PS_LML_2.wav is less than 10s: 7525ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA003/PS/PS_LML_2.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA003/PS/PS_RLL_3.wav
+End time for chirp in audio file raw_data/healthy/HA003/PS/PS_RLL_3.wav is less than 10s: 8725ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA003/PS/PS_RLL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA003/PS/PS_LLL_1.wav
+End time for chirp in audio file raw_data/healthy/HA003/PS/PS_LLL_1.wav is less than 10s: 8900ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA003/PS/PS_LLL_1.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/healthy/HA003/PS/PS_LLL_3.wav
+End time for chirp in audio file raw_data/healthy/HA003/PS/PS_LLL_3.wav is less than 10s: 8888ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/healthy/HA003/PS/PS_LLL_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/ed/ED004/PS/PS_RML_3.wav
+End time for chirp in audio file raw_data/ed/ED004/PS/PS_RML_3.wav is less than 10s: 5613ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/ed/ED004/PS/PS_RML_3.wav
+!!!!!!!!!!!!!
+Processing audio: raw_data/ed/ED004/PS/PS_RLL_2.wav
+End time for chirp in audio file raw_data/ed/ED004/PS/PS_RLL_2.wav is less than 10s: 8375ms!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/ed/ED004/PS/PS_RLL_2.wav
+!!!!!!!!!!!!!
+!!!!!!!!!!!!!
+Failed processing: raw_data/heart_failure/HF003/HF003_012918/PS/PS_RLL_1.wav
+Failed processing: raw_data/heart_failure/HF004/HF004_013018/PS/PS_LLL_3.wav
+Failed processing: raw_data/heart_failure/HF001/HF001_011918/PS/PS_LUL_3.wav
+Failed processing: raw_data/healthy/HA007/PS/PS_RLL_2.wav
+Failed processing: raw_data/healthy/HA007/PS/PS_LLL_3.wav
+Failed processing: raw_data/healthy/HA007/PS/PS_LLL_2.wav
+Failed processing: raw_data/healthy/HA008/PS/PS_LLL_1.wav
+Failed processing: raw_data/healthy/HA008/PS/PS_LLL_2.wav
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_1.wav
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_2.wav
+Failed processing: raw_data/healthy/HA006/PS/PS_RML_3.wav
+Failed processing: raw_data/healthy/HA004/PS/PS_LLL_3.wav
+Failed processing: raw_data/healthy/HA003/PS/PS_LML_2.wav
+Failed processing: raw_data/healthy/HA003/PS/PS_RLL_3.wav
+Failed processing: raw_data/healthy/HA003/PS/PS_LLL_1.wav
+Failed processing: raw_data/healthy/HA003/PS/PS_LLL_3.wav
+Failed processing: raw_data/ed/ED004/PS/PS_RML_3.wav
+Failed processing: raw_data/ed/ED004/PS/PS_RLL_2.wav
+!!!!!!!!!!!!!

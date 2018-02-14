@@ -6,7 +6,7 @@ from scipy.integrate import simps
 dx = 7
 
 def get_feature_headers_for_ps_spectrum():
-    return ['PS - AUC 400Hz-100Hz', 'PS - db increase 400Hz to 600Hz', 'PS - db decrease 400Hz to 600Hz', 'PS - dB change 100Hz to 200Hz', 'PS - db increase 200Hz to 400Hz']
+    return ['PS - AUC 400Hz-100Hz', 'PS - db increase 400Hz to 600Hz', 'PS - dB change 100Hz to 200Hz', 'PS - db increase 200Hz to 400Hz']
 
 def get_features_for_ps_spectrum(spectrum):
     return np.array([
