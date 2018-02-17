@@ -38,7 +38,7 @@ def _get_features(audio_path):
 	features = []
 	for i in range(0, 12):
 		coefficients = mfccs[:,i]
-		headers.append('mean mfcc %d' % i)
+		headers.append('mean_mfcc_%d' % i)
 		features.append(np.mean(coefficients))
 
 	# plt.figure(1, figsize=(9.5, 7))

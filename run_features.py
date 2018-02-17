@@ -38,8 +38,8 @@ def write_features(file, patient_id, patient_dir, create_header):
     features = features + centroid_features
 
     if create_header:
-        file.write(','.join(headers) + '\n')
-    file.write(','.join(map(str, features)) + '\n')
+        file.write(','.join(headers) + ',\r')
+    file.write(','.join(map(str, features)) + ',\r')
 
 
 def get_patient_ids(path, study):
@@ -51,7 +51,6 @@ def get_patient_ids(path, study):
 
 file = open(audio_features_path, "w")
 create_header=True
-print get_patient_ids('%s/healthy' % in_root, 'HA')
 for patient_id in get_patient_ids('%s/healthy' % in_root, 'HA'):
     write_features(file, patient_id, '%s/healthy/%s' % (in_root, patient_id), create_header)
     if create_header:
@@ -61,7 +60,6 @@ for patient_id in get_patient_ids('%s/ed' % in_root, 'ED'):
     write_features(file, patient_id, '%s/ed/%s' % (in_root, patient_id), create_header)
 
 # Process metadata
-sys.exit(0)
 metadata.process_metadata(metadata_path, metadata_features_path)
 
 # Merge audio and metadata features
@@ -73,6 +71,6 @@ all_features.drop(all_features.columns[len(all_features.columns)-1], axis=1, inp
 all_features.to_csv(full_features_path, index=False)
 
 # Normalize features
-min_max_scaler = preprocessing.MinMaxScaler()
-normalized_features = pd.DataFrame(min_max_scaler.fit_transform(all_features))
-normalized_features.to_csv(normalized_features_path, index=False, header=False)
+# min_max_scaler = preprocessing.MinMaxScaler()
+# normalized_features = pd.DataFrame(min_max_scaler.fit_transform(all_features))
+# normalized_features.to_csv(normalized_features_path, index=False, header=False)

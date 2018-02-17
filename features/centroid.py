@@ -35,7 +35,7 @@ def _get_features(audio_path):
 	  spectrumcentroid.append(centroidvalues)            
 	spectrumcentroid = np.array(spectrumcentroid)
 
-	headers = ['mean centroid']
+	headers = ['mean_centroid']
 	features = [np.mean(spectrumcentroid)]
 	#[np.mean(centroid)]
 
