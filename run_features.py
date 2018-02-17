@@ -5,6 +5,7 @@ from sklearn import preprocessing
 sys.path.append('./features')
 import stft
 import mfcc
+import centroid
 import metadata
 
 in_root = 'processed_data'
@@ -31,6 +32,10 @@ def write_features(file, patient_id, patient_dir, create_header):
     mfcc_headers, mfcc_features = mfcc.get_features(patient_dir)
     headers = headers + mfcc_headers
     features = features + mfcc_features
+
+    centroid_headers, centroid_features = centroid.get_features(patient_dir)
+    headers = headers + centroid_headers
+    features = features + centroid_features
 
     if create_header:
         file.write(','.join(headers) + '\n')
