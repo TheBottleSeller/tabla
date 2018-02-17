@@ -9,8 +9,8 @@ features, features_frames = es.MusicExtractor(
     rhythmStats=['mean', 'stdev'],
     tonalStats=['mean', 'stdev'],
     analysisSampleRate=4000,
-    lowlevelFrameSize=1,
-    lowlevelHopSize=1,
+    lowlevelFrameSize=2048, 
+    lowlevelHopSize=512,
     lowlevelWindowType='blackmanharris62'
 )('../processed_data/ed/ED003/PS/PS_LLL_1.wav')
 
