@@ -7,6 +7,9 @@ cd tools/utilFunctions_C
 python compileModule.py build_ext --inplace
 ```
 
+For essentia
+http://essentia.upf.edu/documentation/installing.html
+
 ### Validating Audio Files:
 ```
 python validate_audio_files.py --audio_file_path ~/Google\ Drive/Tabla/Pneumonia\ Study\ Data/ --study PNA
