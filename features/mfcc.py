@@ -7,17 +7,30 @@ N = 1024
 H = 512
 fs = 4000
 
-def get_features(audio_path):
+def get_features(patient_dir):
+	ps_recordings = [file for file in os.listdir("%s/PS" % patient_dir) if file.endswith(".wav")]
+	ps_features = []
+	headers = []
+	for recording in ps_recordings:
+		hs, features = _get_features("%s/PS/%s" % (patient_dir, recording))
+		headers = hs
+		ps_features.append(features)
+	print ps_features
+	average_ps_features = np.mean(ps_features, axis=1)
+	print average_ps_features
+	return headers, average_ps_features
+
+def _get_features(audio_path):
 	spectrum = ess.Spectrum(size=N)
 	window = ess.Windowing(size=M, type='hann')
 	mfcc = ess.MFCC(numberCoefficients = 12)
 	x = ess.MonoLoader(filename=audio_path, sampleRate = fs)()
 	mfccs = []
 
-	for frame in ess.FrameGenerator(x, frameSize=M, hopSize=H, startFromZero=True):          
+	for frame in ess.FrameGenerator(x, frameSize=M, hopSize=H, startFromZero=True):
 	  mX = spectrum(window(frame))
 	  mfcc_bands, mfcc_coeffs = mfcc(mX)
-	  mfccs.append(mfcc_coeffs)            
+	  mfccs.append(mfcc_coeffs)
 	mfccs = np.array(mfccs)
 
 	headers = []
@@ -37,7 +50,7 @@ def get_features(audio_path):
 
 	plt.subplot(2,1,2)
 	numFrames = int(mfccs[:,0].size)
-	frmTime = H*np.arange(numFrames)/float(fs)                                                    
+	frmTime = H*np.arange(numFrames)/float(fs)
 	plt.pcolormesh(frmTime, 1+np.arange(12), np.transpose(mfccs[:,1:]))
 	plt.ylabel('coefficients')
 	plt.title('MFCCs')
@@ -48,5 +61,5 @@ def get_features(audio_path):
 
 	return headers, features
 
-print get_features('../processed_data/ed/ED003/PS/PS_LLL_1.wav')
+print get_features('../processed_data/ed/ED003')
 # print get_features('../../sms-tools/workspace/Tabla_test/ED003_PS_LLL_1.wav')
