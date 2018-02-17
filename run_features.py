@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from sklearn import preprocessing
 sys.path.append('./features')
-import features
+import stft_features
 import metadata
 
 in_root = 'processed_data'
@@ -18,8 +18,8 @@ metadata_cols = []
 # Generate audio features
 file = open(audio_features_path, "w")
 file.write(','.join(features.get_features_headers()) + '\n')
-features.process_audio_features('HA', '%s/healthy' % in_root, file)
-features.process_audio_features('ED', '%s/ed' % in_root, file)
+stft_features.process_audio_features('HA', '%s/healthy' % in_root, file)
+stft_features.process_audio_features('ED', '%s/ed' % in_root, file)
 
 # Process metadata
 metadata.process_metadata(metadata_path, metadata_features_path)
