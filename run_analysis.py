@@ -8,7 +8,7 @@ import general_feature_analysis3 as ga
 #where are the features?
 file_in = 'features/features.csv'
 #where do you want the results to go?
-path_out = 'features/'
+path_out = 'analysis/'
 #what is the variable being analyzed?
 class_id = 'lung_disease'
 
