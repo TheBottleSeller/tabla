@@ -1,5 +1,8 @@
 #you might have to change the directory before
 #importing this.
+import sys
+import os
+sys.path.append('./analysis')
 import general_feature_analysis3 as ga
 
 #where are the features?
