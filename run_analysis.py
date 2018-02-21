@@ -5,11 +5,11 @@ import os
 sys.path.append('./analysis')
 import general_feature_analysis3 as ga
 
-#where are the features?
-file_in = 'features/features.csv'
-#where do you want the results to go?
-path_out = 'analysis/'
-#what is the variable being analyzed?
-class_id = 'lung_disease'
-
-ga.run_analysis(file_in = file_in, path_out = path_out, class_id = class_id)
+ga.run_analysis(file_in = 'features/features.csv',
+                path_out = 'analysis/',
+                class_id = 'lung_disease',
+                features = ga.freq_features,
+                n_comp_pca = 4,
+                k_neighbors = 5,
+                visual_features = ga.visual_sample,
+                visual_file_1 = 'viz1.png')
