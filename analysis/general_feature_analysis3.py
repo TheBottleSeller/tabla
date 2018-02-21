@@ -2,15 +2,39 @@ import numpy as np
 import scipy as sci
 import pandas as pd
 import csv
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from scipy.cluster.vq import vq, kmeans, whiten
 from sklearn.neighbors import KNeighborsClassifier
 
-#This is just an Analysis class that
+######THE FOLLOWING ARE DEFAULT SETTINGS FOR run_analysis()##########
+freq_features = ['mean_mfcc_0',
+                'mean_mfcc_1',
+                'mean_mfcc_2',
+                'mean_mfcc_3',
+                'mean_mfcc_4',
+                'mean_mfcc_5',
+                'mean_mfcc_7',
+                'mean_mfcc_8',
+                'mean_mfcc_9',
+                'mean_mfcc_10',
+                'mean_mfcc_11',
+                'mean_centroid']
+                
+visual_sample = ['mean_mfcc_3',
+                'mean_mfcc_4',
+                'mean_mfcc_5',
+                'mean_mfcc_7',
+                'mean_mfcc_8']
+
+#####################################################################
+
+#This is an Analysis class that
 #will structure further statistical analyses.
 #enter the data as a dataframe.
+#build models and put them in Analysis.models dictionary
 
 class Analysis():
     def __init__(self, data, class_id, models ={}):
@@ -19,21 +43,20 @@ class Analysis():
         self.models = models
 
     #this neatly applies a univariate analysis to each feature.
-    def single_variate_test(self, df, func, name):
-        df0 = df[df[self.class_id] == 0]
-        df1 = df[df[self.class_id] == 1]
+    def single_variate_test(self, func, name):
+        df0 = self.data[self.data[self.class_id] == 0]
+        df1 = self.data[self.data[self.class_id] == 1]
         result_df = pd.DataFrame()
         for col in list(self.data):
             try:
                 result = func(df0[col],df1[col])
-                print(result)
                 result_df[name + col] = [result]
             except:
                 result_df[name + col] = [None]
-                print("In none")
+                print("Statistical Test did not work for {0}".format(str(list(df0[col]))))
         return(result_df)
 
-    #this creates a pca in the Analysis
+    #this creates a pca in the Analysis.models attribute
     def add_pca(self, features = [], n_comp = 3):
 
         if features !=[]:
@@ -44,11 +67,12 @@ class Analysis():
 
         pca = PCA(n_components = n_comp)
         pca.fit(df)
+        print("Explained variance by principle components")
         print(pca.explained_variance_ratio_)
         self.models['pca'] = pca
 
     #this trains a knn for the analysis.
-    #it only uses the features you provide it.
+    #it only uses the subset of features you provide it.
     def train_knn(self, features, k_neighbors):
 
         if features !=[]:
@@ -62,7 +86,7 @@ class Analysis():
         self.models['knn'] = neigh
 
     #this function applies k_means clustering to the data.
-    #most of it was taken from the sound analysis.
+    #most of it was taken from SoundAnalysis.py
     def k_means_cluster(self, features):
         ftrArr = np.array(self.data.loc[:,features])
         infoArr = np.array([[x,self.data.loc[x,self.class_id]] for x in range(self.data.shape[0])])
@@ -70,7 +94,6 @@ class Analysis():
 
         ftrArr = np.array(ftrArr)
         infoArr = np.array(infoArr)
-
 
         ftrArrWhite = whiten(ftrArr)
         centroids, distortion = kmeans(ftrArrWhite, nCluster)
@@ -109,41 +132,30 @@ class Analysis():
         globalDecisions = np.array(globalDecisions)
         totalSounds = len(globalDecisions)
         nIncorrectClassified = len(np.where(globalDecisions==0)[0])
-        return(ClusterOut)
+        return([ClusterOut, classCluster, centroids])
 
-    #this plots each patient on two features.
-    def scatter_plot(self, x_axis, y_axis):
+    #this plots a group of featurs against themselves.
+    def scatter_plot(self, features, directory):
         colors = ['r', 'g', 'c', 'b', 'k', 'm', 'y']
-        plt.figure()
-        plt.hold(True)
-        for i in range(self.data.shape[0]):
-            x_cord = self.data.loc[i,x_axis]
-            y_cord = self.data.loc[i,y_axis]
-            plt.scatter(x_cord,y_cord, c = colors[self.data.loc[i,self.class_id]], s=200, hold = True, alpha=0.75)
-
-            circ = Line2D([0], [0], linestyle="none", marker="o", alpha=0.75, markersize=10, markerfacecolor=colors[ii])
-            legArray.append(circ)
-
-        plt.ylabel(y_axis, fontsize =16)
-        plt.xlabel(x_axis, fontsize =16)
-        plt.show()
-
-
-
-#we default to looking only at the frequency features
-#(except the ttest looks at everything)
-freq_features = ['mean_mfcc_0',
-                'mean_mfcc_1',
-                'mean_mfcc_2',
-                'mean_mfcc_3',
-                'mean_mfcc_4',
-                'mean_mfcc_5',
-                'mean_mfcc_7',
-                'mean_mfcc_8',
-                'mean_mfcc_9',
-                'mean_mfcc_10',
-                'mean_mfcc_11',
-                'mean_centroid']
+        plt.figure(figsize= (10,10))
+        for ii in range(len(features)):
+            for jj in range(len(features)):
+                plt.subplot(len(features),len(features), ii*len(features) + jj + 1)
+                for i in range(self.data.shape[0]):
+                    x_cord = self.data.loc[i,features[jj]]
+                    y_cord = self.data.loc[i,features[ii]]
+                    plt.scatter(x_cord,y_cord, c = colors[self.data.loc[i,self.class_id]], s=20, alpha=0.75)
+                    #circ = Line2D([0], [0], linestyle="none", marker="o", alpha=0.75, markersize=10, markerfacecolor=colors[])
+                    #legArray.append(circ)
+                    if jj == 0:
+                        plt.ylabel(features[ii])
+                    else:
+                        plt.yticks([])
+                    if ii == len(features) -1:
+                        plt.xlabel(features[jj])
+                    else:
+                        plt.xticks([])
+        plt.savefig(directory)
 
 #currently, this doesn't return anything regarding kmeans.
 #It's not clear what it should return - the vote?
@@ -156,7 +168,9 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
                 class_id = 'lung_disease',
                 features = freq_features,
                 n_comp_pca = 4,
-                k_neighbors = 5):
+                k_neighbors = 5,
+                visual_features = visual_sample,
+                visual_file_1 = 'viz1.png'):
 
     df = pd.read_csv(file_in)
     a1 = Analysis(data = df, class_id = class_id)
@@ -197,7 +211,7 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
 
     #single variate tests
     #ttests
-    ttest_df = a1.single_variate_test(df, f_ttest, name = "ttest_")
+    ttest_df = a1.single_variate_test(f_ttest, name = "ttest_")
 
     #now we have to construct the raw output of the transformation:
     transformations = pd.concat([reduced_df,knn_df,knn2_df], axis = 1)
@@ -211,17 +225,13 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
         #the results file is a singe
     results_path = path_out + "results.csv"
     transformations_path = path_out + "transformations.csv"
+    visualize_path = path_out + visual_file_1
+    
     result2.to_csv(results_path)
     transformations.to_csv(transformations_path)
+    #now it needs to plot some stuff.
+    a1.scatter_plot(visual_features, visualize_path)
 
 def f_ttest(col1, col2):
     result = sci.stats.ttest_ind(col1, col2, equal_var = False)
     return(result[1])
-
-####Example
-
-#this is the sample file
-# df = pd.read_csv('../features/features.csv')
-#
-# test = Analysis(data = df, class_id = 'lung_disease')
-# result = test.single_variate_test(f_ttest, name = 'ttest_')
