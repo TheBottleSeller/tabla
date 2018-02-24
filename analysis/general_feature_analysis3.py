@@ -22,7 +22,7 @@ freq_features = ['mean_mfcc_0',
                 'mean_mfcc_10',
                 'mean_mfcc_11',
                 'mean_centroid']
-                
+
 visual_sample = ['mean_mfcc_3',
                 'mean_mfcc_4',
                 'mean_mfcc_5',
@@ -199,7 +199,7 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     #now knn on pca'ed coordinates
     df2 = pd.concat([pd.DataFrame(reduced_df), df.loc[:,class_id]], axis=1)
     a2 = Analysis(data = df2, class_id = class_id)
-    a2.train_knn(features = reduced_cols, k_neighbors = 5)
+    a2.train_knn(features = reduced_cols, k_neighbors = k_neighbors)
 
     knn2_results = a2.models['knn'].predict_proba(pd.DataFrame(reduced_df))
     knn2_cols = ['pc_{0}_knn_vote'.format(str(i)) for i in df.loc[:,class_id].unique()]
@@ -226,7 +226,7 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     results_path = path_out + "results.csv"
     transformations_path = path_out + "transformations.csv"
     visualize_path = path_out + visual_file_1
-    
+
     result2.to_csv(results_path)
     transformations.to_csv(transformations_path)
     #now it needs to plot some stuff.
