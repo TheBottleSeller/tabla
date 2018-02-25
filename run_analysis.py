@@ -8,6 +8,6 @@ ga.run_analysis(file_in = 'features/features.csv',
                 class_id = 'lung_disease',
                 features = ga.freq_features,
                 n_comp_pca = 7,
-                k_neighbors = 7,
+                k_neighbors = 3,
                 visual_features = ga.visual_sample,
                 visual_file_1 = 'viz1.png')

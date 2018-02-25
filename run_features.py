@@ -15,7 +15,8 @@ metadata_features_path = 'features/metadata_features.csv'
 full_features_path = 'features/features.csv'
 normalized_features_path = 'features/normalized_features.csv'
 
-bad_patient_ids = ["HA001", "HA002"]
+# ED002 and ED004 are pneumothorax
+bad_patient_ids = ["HA001", "HA002", "ED002", "ED004"]
 
 metadata_cols = []
 
