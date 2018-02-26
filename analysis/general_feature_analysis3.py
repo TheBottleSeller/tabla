@@ -226,11 +226,14 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     results_path = path_out + "results.csv"
     transformations_path = path_out + "transformations.csv"
     visualize_path = path_out + visual_file_1
+    visualize2_path = path_out + 'pca_viz.png'
 
     result2.to_csv(results_path)
     transformations.to_csv(transformations_path)
+    
     #now it needs to plot some stuff.
     a1.scatter_plot(visual_features, visualize_path)
+    a2.scatter_plot(reduced_cols, visualize2_path)
 
 def f_ttest(col1, col2):
     result = sci.stats.ttest_ind(col1, col2, equal_var = False)
