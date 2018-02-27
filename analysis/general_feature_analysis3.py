@@ -230,7 +230,7 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
 
     result2.to_csv(results_path)
     transformations.to_csv(transformations_path)
-    
+
     #now it needs to plot some stuff.
     a1.scatter_plot(visual_features, visualize_path)
     a2.scatter_plot(reduced_cols, visualize2_path)
