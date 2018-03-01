@@ -7,6 +7,7 @@ import stft
 import mfcc
 import centroid
 import metadata
+sys.path.append('./essentia/src/python/essentia')
 
 in_root = 'processed_data'
 audio_features_path = 'features/audio_features.csv'

@@ -10,7 +10,7 @@ from scipy.cluster.vq import vq, kmeans, whiten
 from sklearn.neighbors import KNeighborsClassifier
 
 ######THE FOLLOWING ARE DEFAULT SETTINGS FOR run_analysis()##########
-freq_features = ['mean_mfcc_0',
+audio_features = ['mean_mfcc_0',
                 'mean_mfcc_1',
                 'mean_mfcc_2',
                 'mean_mfcc_3',
@@ -22,6 +22,26 @@ freq_features = ['mean_mfcc_0',
                 'mean_mfcc_10',
                 'mean_mfcc_11',
                 'mean_centroid']
+
+clinical_features = [
+    'age',
+    'male',
+    'female',
+    'thorax_circ',
+    'smoking_packs',
+
+    # 'temp',
+    # 'bp_systolic',
+    # 'bp_diastolic',
+    # 'hr',
+    # 'rr',
+    # 'sp02',
+    # 'peak_flow',
+    # 'sob',
+    # 'wheezing'
+]
+
+freq_features = audio_features + clinical_features
 
 visual_sample = ['mean_mfcc_3',
                 'mean_mfcc_4',
