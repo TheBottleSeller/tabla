@@ -226,7 +226,7 @@ class Analysis():
                 if parameters['box'] == False:
                     ax.spines['right'].set_visible(False)
                     ax.spines['top'].set_visible(False)
-               
+
                 ax.tick_params(labelsize = 20/(len(features)**.5))
 
                 #fig1 = plt.figure(facecolor='white')
@@ -266,8 +266,6 @@ class Analysis():
 
         plt.suptitle(parameters['title'], fontsize = parameters['title_font_size'], y = parameters['title_height'])
         plt.savefig(directory, bbox_inches='tight')
-        
-
 
 #currently, this doesn't return anything regarding kmeans.
 #It's not clear what it should return - the vote?
