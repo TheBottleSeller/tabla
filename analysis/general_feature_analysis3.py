@@ -3,6 +3,7 @@ import scipy as sci
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
@@ -28,6 +29,69 @@ visual_sample = ['mean_mfcc_3',
                 'mean_mfcc_5',
                 'mean_mfcc_7',
                 'mean_mfcc_8']
+
+#These are the set of parameters that are passed to the
+#graphing program
+
+#'c': what color do you want the dots that belong to
+#class 1, class 2, etc. to be.
+
+#'s': what shape do you want the dots that belong to
+#class 1, class 2, etc. to have.
+
+#'title': the title of the graph, 'title_font_size', and
+#'title_height' are self explanatory.
+
+#'point_size': how big do you want the points to be? If it
+#is set at zero, it will make the points smaller the more
+#graphs that you have.
+
+#'font_size': same as point size. Font size of x,y labels.
+
+#label_coordinates: pretty self explanatory.
+
+#'dimensions': make the actual picture bigger or smaller.
+
+#'legend': currently not yet functional.
+
+#'box': do you want the graph to be in a box, or do you
+#want only the axes to have lines?
+
+g1_params_default = {
+    'c':['r', 'g', 'c', 'b', 'k', 'm', 'y'],
+    'marker':['.','.','.','.','.','.','.'],
+    'title': 'Sample title',
+    'title_font_size':24,
+    'title_height': .95,
+    'point_size':0,
+    'font_size':0,
+    'x_label':'default',
+    'y_label':'default',
+    'x_label_y_coord': 0,
+    'y_label_x_coord': 0,
+    'dimensions': (10,10),
+    'legend': 'xx',
+    'box': False
+    }
+
+#this set of parameters makes a bunch of points
+#of just x's and o's
+g1_params_paper = {
+    'c':['k','k','k','k','k','k','k'],
+    'marker':['o','x','o','x','o','x','o'],
+    'title': 'Sample title',
+    'title_font_size':24,
+    'title_height': .95,
+    'point_size':0,
+    'font_size':0,
+    'x_label':'default',
+    'y_label':'default',
+    'x_label_y_coord': 0,
+    'y_label_x_coord': 0,
+    'dimensions': (10,10),
+    'legend': 'xx',
+    'box': False
+    }
 
 #####################################################################
 
@@ -134,28 +198,76 @@ class Analysis():
         nIncorrectClassified = len(np.where(globalDecisions==0)[0])
         return([ClusterOut, classCluster, centroids])
 
-    #this plots a group of featurs against themselves.
-    def scatter_plot(self, features, directory):
-        colors = ['r', 'g', 'c', 'b', 'k', 'm', 'y']
-        plt.figure(figsize= (10,10))
+ #plots a group of featurs against themselves.
+    def scatter_plot(self, features, directory, parameters):
+
+        #sent over
+        if parameters['font_size'] == 0:
+            font_size = 20/(len(features)**.5)
+        else:
+            font_size = parameters['font_size']
+
+        if parameters['point_size'] == 0:
+            point_size = 240/len(features)
+        else:
+            point_size = parameters['point_size']
+
+        plt.figure(figsize= parameters['dimensions'])
+
         for ii in range(len(features)):
             for jj in range(len(features)):
-                plt.subplot(len(features),len(features), ii*len(features) + jj + 1)
+                if jj >= ii:
+                    continue
+
+                #I would suggest not altering this line:
+                ax = plt.subplot(len(features) - 1,len(features) - 1,
+                            ((ii - 1)*len(features) + jj + 2 - ii))
+
+                if parameters['box'] == False:
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['top'].set_visible(False)
+               
+                ax.tick_params(labelsize = 20/(len(features)**.5))
+
+                #fig1 = plt.figure(facecolor='white')
+                #ax1 = plt.axes(frameon=False)
+
                 for i in range(self.data.shape[0]):
                     x_cord = self.data.loc[i,features[jj]]
                     y_cord = self.data.loc[i,features[ii]]
-                    plt.scatter(x_cord,y_cord, c = colors[self.data.loc[i,self.class_id]], s=20, alpha=0.75)
+                    ax.scatter(x_cord,y_cord,
+                                c = parameters['c'][self.data.loc[i,self.class_id]],
+                                marker = parameters['marker'][self.data.loc[i,self.class_id]],
+                                s = 240/len(features), alpha=0.75)
+
+                    #INSERT INDIVIDUAL SUBPLOT FEATURES HERE
+
                     #circ = Line2D([0], [0], linestyle="none", marker="o", alpha=0.75, markersize=10, markerfacecolor=colors[])
                     #legArray.append(circ)
                     if jj == 0:
-                        plt.ylabel(features[ii])
+                        if parameters['y_label'] == 'default':
+                            y_label = features[ii]
+                        else:
+                            y_label = parameters['y_label']
+                        plt.ylabel(y_label, fontsize = font_size, x = parameters['y_label_x_coord'])
                     else:
                         plt.yticks([])
-                    if ii == len(features) -1:
-                        plt.xlabel(features[jj])
+                    if ii == len(features) - 1:
+                        if parameters['x_label'] == 'default':
+                            x_label = features[jj]
+                        else:
+                            x_label = parameters['x_label']
+                        plt.xlabel(x_label, fontsize = font_size, y = parameters['x_label_y_coord'])
                     else:
                         plt.xticks([])
-        plt.savefig(directory)
+
+        #INSERT LEGEND HERE
+
+
+        plt.suptitle(parameters['title'], fontsize = parameters['title_font_size'], y = parameters['title_height'])
+        plt.savefig(directory, bbox_inches='tight')
+        
+
 
 #currently, this doesn't return anything regarding kmeans.
 #It's not clear what it should return - the vote?
@@ -170,7 +282,9 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
                 n_comp_pca = 4,
                 k_neighbors = 5,
                 visual_features = visual_sample,
-                visual_file_1 = 'viz1.png'):
+                visual_file_1 = 'viz1.png',
+                g1_parameters = g1_params_default,
+                g2_parameters = g1_params_default):
 
     df = pd.read_csv(file_in)
     a1 = Analysis(data = df, class_id = class_id)
@@ -232,8 +346,8 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     transformations.to_csv(transformations_path)
 
     #now it needs to plot some stuff.
-    a1.scatter_plot(visual_features, visualize_path)
-    a2.scatter_plot(reduced_cols, visualize2_path)
+    a1.scatter_plot(visual_features, visualize_path, parameters = g1_parameters)
+    a2.scatter_plot(reduced_cols, visualize2_path, parameters = g2_parameters)
 
 def f_ttest(col1, col2):
     result = sci.stats.ttest_ind(col1, col2, equal_var = False)
