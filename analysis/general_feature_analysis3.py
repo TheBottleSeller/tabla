@@ -255,13 +255,13 @@ class Analysis():
                 #Add the tick marks and labels only for the graphs
                 #that are on the edges
                 if jj == 0:
-                      if parameters['y_label'] == 'default':
-                            y_label = features[ii]
-                        else:
-                            y_label = parameters['y_label']
-                        plt.ylabel(y_label, fontsize = font_size, x = parameters['y_label_x_coord'])
+                    if parameters['y_label'] == 'default':
+                        y_label = features[ii]
                     else:
-                        plt.yticks([])
+                        y_label = parameters['y_label']
+                    plt.ylabel(y_label, fontsize = font_size, x = parameters['y_label_x_coord'])
+                else:
+                    plt.yticks([])
                 if ii == len(features) - 1:
                     if parameters['x_label'] == 'default':
                         x_label = features[jj]
