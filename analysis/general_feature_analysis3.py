@@ -30,90 +30,90 @@ visual_sample = ['mean_mfcc_3',
                 'mean_mfcc_7',
                 'mean_mfcc_8']
 
-#These are the set of parameters that are passed to the
-#graphing program
 
-#'c': what color do you want the dots that belong to
-#class 1, class 2, etc. to be.
-
-#'s': what shape do you want the dots that belong to
-#class 1, class 2, etc. to have.
-
+#What follows is a set of parameters for figue output.
+#'c': what color do you want the dots that belong to class 1, class 2, etc. to be.
+#'s': what shape do you want the dots that belong to class 1, class 2, etc. to have.
 #'title': the title of the graph, 'title_font_size', and
 #'title_height' are self explanatory.
-
-#'point_size': how big do you want the points to be? If it
-#is set at zero, it will make the points smaller the more
-#graphs that you have.
-
+#'point_size': how big do you want the points to be? If it is set at zero, it will make the points smaller the more graphs that you have.
 #'font_size': same as point size. Font size of x,y labels.
-
 #label_coordinates: pretty self explanatory.
-
 #'dimensions': make the actual picture bigger or smaller.
-
 #'legend': currently not yet functional.
-
-#'box': do you want the graph to be in a box, or do you
-#want only the axes to have lines?
-
+#'box': do you want the graph to be in a box, or do you want only the axes to have lines?
 g1_params_default = {
     'c':['r', 'g', 'c', 'b', 'k', 'm', 'y'],
-    'marker':['.','.','.','.','.','.','.'],
-    'title': 'Sample title',
-    'title_font_size':24,
-    'title_height': .95,
-    'point_size':0,
-    'font_size':0,
-    'x_label':'default',
-    'y_label':'default',
-    'x_label_y_coord': 0,
-    'y_label_x_coord': 0,
-    'dimensions': (10,10),
-    'legend': 'xx',
-    'box': False
+    'marker':['.', '.', '.', '.', '.', '.', '.'],
+    'title' : 'Sample title',
+    'title_font_size' : 24,
+    'title_height' : .95,
+    'point_size' : 0,
+    'font_size' : 0,
+    'x_label' : 'default',
+    'y_label' : 'default',
+    'x_label_y_coord' : 0,
+    'y_label_x_coord' : 0,
+    'dimensions' : (10,10),
+    'legend' : 'xx',
+    'box' : False
     }
+
 
 #this set of parameters makes a bunch of points
 #of just x's and o's
 g1_params_paper = {
-    'c':['k','k','k','k','k','k','k'],
-    'marker':['o','x','o','x','o','x','o'],
-    'title': 'Sample title',
-    'title_font_size':24,
-    'title_height': .95,
-    'point_size':0,
-    'font_size':0,
-    'x_label':'default',
-    'y_label':'default',
-    'x_label_y_coord': 0,
-    'y_label_x_coord': 0,
-    'dimensions': (10,10),
-    'legend': 'xx',
-    'box': False
+    'c' : ['k', 'k', 'k', 'k', 'k', 'k', 'k'],
+    'marker': ['o', 'x', 'o', 'x', 'o', 'x', 'o'],
+    'title' : 'Sample title',
+    'title_font_size' : 24,
+    'title_height' : .95,
+    'point_size' : 0,
+    'font_size' : 0,
+    'x_label' : 'default',
+    'y_label' : 'default',
+    'x_label_y_coord' : 0,
+    'y_label_x_coord' : 0,
+    'dimensions' : (10,10),
+    'legend' : 'xx',
+    'box' : False
     }
 
 #####################################################################
 
 #This is an Analysis class that
-#will structure further statistical analyses.
+#supports further statistical analyses for any data frame.
 #enter the data as a dataframe.
 #build models and put them in Analysis.models dictionary
 
 class Analysis():
+
     def __init__(self, data, class_id, models ={}):
         self.data = data
         self.class_id = class_id
         self.models = models
 
     #this neatly applies a univariate analysis to each feature.
+    #currently, only two classes of result feature are supported.
+    #you can run a for loop for each class if you want to support
+    #more classes.
+
     def single_variate_test(self, func, name):
+
+        #group0
         df0 = self.data[self.data[self.class_id] == 0]
+
+        #group1
         df1 = self.data[self.data[self.class_id] == 1]
+
         result_df = pd.DataFrame()
+
+        #for each column in the data frame
         for col in list(self.data):
+          #apply the statistical test "func"
+          #to group0 and group1
             try:
-                result = func(df0[col],df1[col])
+                result = func(df0[col], df1[col])
                 result_df[name + col] = [result]
             except:
                 result_df[name + col] = [None]
@@ -124,7 +124,7 @@ class Analysis():
     def add_pca(self, features = [], n_comp = 3):
 
         if features !=[]:
-            df = self.data.loc[:,features]
+          df = self.data.loc[:,features]
         else:
             features = [x for x in list(self.data) if x != self.class_id]
             df = self.data.loc[:,features]
@@ -198,8 +198,11 @@ class Analysis():
         nIncorrectClassified = len(np.where(globalDecisions==0)[0])
         return([ClusterOut, classCluster, centroids])
 
- #plots a group of featurs against themselves.
-    def scatter_plot(self, features, directory, parameters):
+    #plots a group of features against themselves.
+    def scatter_plot(self,
+                     features,
+                     directory,
+                     parameters):
 
         #sent over
         if parameters['font_size'] == 0:
@@ -212,26 +215,33 @@ class Analysis():
         else:
             point_size = parameters['point_size']
 
-        plt.figure(figsize= parameters['dimensions'])
+        #this is the size of the png
+        plt.figure(figsize = parameters['dimensions'])
 
+        #for each subgraph (each pair of features)...
         for ii in range(len(features)):
             for jj in range(len(features)):
+              #skip it if the row index is higher than the column index
                 if jj >= ii:
                     continue
 
-                #I would suggest not altering this line:
-                ax = plt.subplot(len(features) - 1,len(features) - 1,
-                            ((ii - 1)*len(features) + jj + 2 - ii))
+                #This line is complicated. It basically adjusts the
+                #Dimensions of the plots so that the excluded plots don't
+                #take up a bunch of white space.
+                ax = plt.subplot(len(features) - 1, len(features) - 1,
+                            ((ii - 1) * len(features) + jj + 2 - ii))
 
+
+                #get rid of the right and upper lines if you want to.
                 if parameters['box'] == False:
                     ax.spines['right'].set_visible(False)
                     ax.spines['top'].set_visible(False)
 
                 ax.tick_params(labelsize = 20/(len(features)**.5))
 
-                #fig1 = plt.figure(facecolor='white')
-                #ax1 = plt.axes(frameon=False)
-
+                #add each point
+                #there's probably a way to do this with arrays and no
+                #for loop. Oh well.
                 for i in range(self.data.shape[0]):
                     x_cord = self.data.loc[i,features[jj]]
                     y_cord = self.data.loc[i,features[ii]]
@@ -240,29 +250,28 @@ class Analysis():
                                 marker = parameters['marker'][self.data.loc[i,self.class_id]],
                                 s = 240/len(features), alpha=0.75)
 
-                    #INSERT INDIVIDUAL SUBPLOT FEATURES HERE
-
-                    #circ = Line2D([0], [0], linestyle="none", marker="o", alpha=0.75, markersize=10, markerfacecolor=colors[])
-                    #legArray.append(circ)
-                    if jj == 0:
-                        if parameters['y_label'] == 'default':
+                 #INSERT INDIVIDUAL SUBPLOT FEATURES HERE
+                 
+                #Add the tick marks and labels only for the graphs
+                #that are on the edges
+                if jj == 0:
+                      if parameters['y_label'] == 'default':
                             y_label = features[ii]
                         else:
                             y_label = parameters['y_label']
                         plt.ylabel(y_label, fontsize = font_size, x = parameters['y_label_x_coord'])
                     else:
                         plt.yticks([])
-                    if ii == len(features) - 1:
-                        if parameters['x_label'] == 'default':
-                            x_label = features[jj]
-                        else:
-                            x_label = parameters['x_label']
-                        plt.xlabel(x_label, fontsize = font_size, y = parameters['x_label_y_coord'])
+                if ii == len(features) - 1:
+                    if parameters['x_label'] == 'default':
+                        x_label = features[jj]
                     else:
-                        plt.xticks([])
+                        x_label = parameters['x_label']
+                    plt.xlabel(x_label, fontsize = font_size, y = parameters['x_label_y_coord'])
+                else:
+                    plt.xticks([])
 
-        #INSERT LEGEND HERE
-
+        #I'm not sure where the legend stuff goes, but you might want to put it here.
 
         plt.suptitle(parameters['title'], fontsize = parameters['title_font_size'], y = parameters['title_height'])
         plt.savefig(directory, bbox_inches='tight')
