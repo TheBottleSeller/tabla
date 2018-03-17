@@ -117,7 +117,7 @@ def train_pca(train_x,
               n_components,
               color_dictionary,
               directory):
-    
+
     #train pca with n components
     pca = PCA(n_components = n_components)
     pca.fit(train_x)
@@ -133,7 +133,7 @@ def train_pca(train_x,
                reduced[:,1],
                c = result)
     plt.savefig(directory, bbox_inches='tight')
-    
+
     #return both the model [0] and the reduced coordinates [1]
     return([pca, reduced])
 
@@ -164,7 +164,7 @@ def get_frames_and_models(freq_bins,
 
     all_files = [all_files[x] for x in indicies]
     all_labels = [all_labels[x] for x in indicies]
-        
+
     #we need to create the dataframes
     #for the frequency and time waveforms
     #it's as clunky af, but it will work.
@@ -218,11 +218,11 @@ def get_frames_and_models(freq_bins,
         #do the same for the time waves
         tnrow = len(times.index)
         trowtrain = round(tnrow*perc_training)
-        
+
         ttrain = times.iloc[range(0,trowtrain),:]
         ttrain_x = ttrain.iloc[:,range(2,time_bins + 2)]
         ttrain_y = ttrain.outcome
-        
+
         ttest = times.iloc[range(trowtrain,tnrow),:]
         ttest_x = ttest.iloc[:,range(2,(time_bins + 2))]
         ttest_y = ttest.outcome
