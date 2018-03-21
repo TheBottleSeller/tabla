@@ -5,7 +5,7 @@ sys.path.append('./analysis')
 import pipe_to_model as pipe
 
 #this file takes raw data, but you could have it take any type of data you want
-in_root = 'raw_data'
+in_root = 'processed_data'
 
 def walk_and_process_audio(path,all_files = []):
     in_dir = os.path.join(in_root, path)
@@ -50,7 +50,7 @@ data = pipe.get_frames_and_models(257,
                                   60000,
                                   all_files[0:200],
                                   sound_type[0:200],
-                                  color_dictionary = {"PS":"red","BS":"blue","TF":"green"},
+                                  color_dictionary = {"PS":"red","BS":"blue","TF":"black"},
                                   perc_training = .8,
                                   directory = "./analysis/"
                                   )

@@ -231,6 +231,7 @@ def get_frames_and_models(freq_bins,
 
         print("3 components")
         pca_total = train_pca(ftrain_x, ftrain_y, 3, color_dictionary, directory + "freq_pca_3.png")
+        print(pca_total.components_[0])
         print("4 components")
         pca_total1 = train_pca(ftrain_x, ftrain_y, 4, color_dictionary, directory + "freq_pca_4.png")
         print("5 components")
