@@ -21,9 +21,9 @@ def get_features_for_type(patient_dir, recording_type):
 	features = []
 	headers = []
 	for recording in recordings:
-		hs, features = _get_features("%s/%s/%s" % (patient_dir, recording_type, recording), recording_type)
+		hs, f = _get_features("%s/%s/%s" % (patient_dir, recording_type, recording), recording_type)
 		headers = hs
-		features.append(features)
+		features.append(f)
 	average_features = np.mean(features, axis=0)
 	return headers, average_features.tolist()
 

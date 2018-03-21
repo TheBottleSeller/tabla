@@ -10,18 +10,32 @@ from scipy.cluster.vq import vq, kmeans, whiten
 from sklearn.neighbors import KNeighborsClassifier
 
 ######THE FOLLOWING ARE DEFAULT SETTINGS FOR run_analysis()##########
-audio_features = ['mean_mfcc_0',
-                'mean_mfcc_1',
-                'mean_mfcc_2',
-                'mean_mfcc_3',
-                'mean_mfcc_4',
-                'mean_mfcc_5',
-                'mean_mfcc_7',
-                'mean_mfcc_8',
-                'mean_mfcc_9',
-                'mean_mfcc_10',
-                'mean_mfcc_11',
-                'mean_centroid']
+audio_features = [
+                'PS_mean_mfcc_0',
+                'PS_mean_mfcc_1',
+                'PS_mean_mfcc_2',
+                'PS_mean_mfcc_3',
+                'PS_mean_mfcc_4',
+                'PS_mean_mfcc_5',
+                'PS_mean_mfcc_7',
+                'PS_mean_mfcc_8',
+                'PS_mean_mfcc_9',
+                'PS_mean_mfcc_10',
+                'PS_mean_mfcc_11',
+                'PS_mean_centroid',
+                # 'BS_mean_mfcc_0',
+                # 'BS_mean_mfcc_1',
+                # 'BS_mean_mfcc_2',
+                # 'BS_mean_mfcc_3',
+                # 'BS_mean_mfcc_4',
+                # 'BS_mean_mfcc_5',
+                # 'BS_mean_mfcc_7',
+                # 'BS_mean_mfcc_8',
+                # 'BS_mean_mfcc_9',
+                # 'BS_mean_mfcc_10',
+                # 'BS_mean_mfcc_11',
+                # 'BS_mean_centroid',
+                ]
 
 clinical_features = [
     'age',
@@ -43,11 +57,8 @@ clinical_features = [
 
 freq_features = audio_features + clinical_features
 
-visual_sample = ['mean_mfcc_3',
-                'mean_mfcc_4',
-                'mean_mfcc_5',
-                'mean_mfcc_7',
-                'mean_mfcc_8']
+visual_sample = ['PS_mean_mfcc_5',
+                'PS_mean_mfcc_8']
 
 #####################################################################
 
@@ -87,8 +98,8 @@ class Analysis():
 
         pca = PCA(n_components = n_comp)
         pca.fit(df)
-        print("Explained variance by principle components")
-        print(pca.explained_variance_ratio_)
+        # print("Explained variance by principle components")
+        # print(pca.explained_variance_ratio_)
         self.models['pca'] = pca
 
     #this trains a knn for the analysis.
@@ -215,6 +226,8 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     knn_cols = ['{0}_knn_vote'.format(str(i)) for i in df.loc[:,class_id].unique()]
     knn_df = pd.DataFrame(knn_results, columns = knn_cols)
     knn_score = a1.models['knn'].score(df.loc[:,features],df.loc[:,class_id])
+    #print knn_score
+    #return
 
     #now knn on pca'ed coordinates
     df2 = pd.concat([pd.DataFrame(reduced_df), df.loc[:,class_id]], axis=1)
