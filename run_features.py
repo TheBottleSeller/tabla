@@ -4,9 +4,10 @@ import pandas as pd
 from sklearn import preprocessing
 sys.path.append('./features')
 import stft
-import mfcc
-import centroid
+# import mfcc
+# import centroid
 import metadata
+# sys.path.append('./essentia/src/python/essentia')
 
 in_root = 'processed_data'
 audio_features_path = 'features/audio_features.csv'
@@ -50,15 +51,15 @@ def get_patient_ids(path, study):
     return patient_ids
 
 
-file = open(audio_features_path, "w")
-create_header=True
-for patient_id in get_patient_ids('%s/healthy' % in_root, 'HA'):
-    write_features(file, patient_id, '%s/healthy/%s' % (in_root, patient_id), create_header)
-    if create_header:
-        create_header=False
-
-for patient_id in get_patient_ids('%s/ed' % in_root, 'ED'):
-    write_features(file, patient_id, '%s/ed/%s' % (in_root, patient_id), create_header)
+# file = open(audio_features_path, "w")
+# create_header=True
+# for patient_id in get_patient_ids('%s/healthy' % in_root, 'HA'):
+#     write_features(file, patient_id, '%s/healthy/%s' % (in_root, patient_id), create_header)
+#     if create_header:
+#         create_header=False
+#
+# for patient_id in get_patient_ids('%s/ed' % in_root, 'ED'):
+#     write_features(file, patient_id, '%s/ed/%s' % (in_root, patient_id), create_header)
 
 # Process metadata
 metadata.process_metadata(metadata_path, metadata_features_path)
@@ -66,6 +67,7 @@ metadata.process_metadata(metadata_path, metadata_features_path)
 # Merge audio and metadata features
 audio_features = pd.read_csv(audio_features_path)
 metadata_features = pd.read_csv(metadata_features_path)
+
 all_features = metadata_features.merge(audio_features, on='id', how="inner")
 all_features.drop('id', axis=1, inplace=True)
 all_features.drop(all_features.columns[len(all_features.columns)-1], axis=1, inplace=True)

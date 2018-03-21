@@ -11,24 +11,59 @@ from scipy.cluster.vq import vq, kmeans, whiten
 from sklearn.neighbors import KNeighborsClassifier
 
 ######THE FOLLOWING ARE DEFAULT SETTINGS FOR run_analysis()##########
-freq_features = ['mean_mfcc_0',
-                'mean_mfcc_1',
-                'mean_mfcc_2',
-                'mean_mfcc_3',
-                'mean_mfcc_4',
-                'mean_mfcc_5',
-                'mean_mfcc_7',
-                'mean_mfcc_8',
-                'mean_mfcc_9',
-                'mean_mfcc_10',
-                'mean_mfcc_11',
-                'mean_centroid']
+ps_audio_features = [
+                'PS_mean_mfcc_0',
+                'PS_mean_mfcc_1',
+                'PS_mean_mfcc_2',
+                'PS_mean_mfcc_3',
+                'PS_mean_mfcc_4',
+                'PS_mean_mfcc_5',
+                'PS_mean_mfcc_7',
+                'PS_mean_mfcc_8',
+                'PS_mean_mfcc_9',
+                'PS_mean_mfcc_10',
+                'PS_mean_mfcc_11',
+                'PS_mean_centroid',
+                ]
+bs_audio_features = [
+                'BS_mean_mfcc_0',
+                'BS_mean_mfcc_1',
+                'BS_mean_mfcc_2',
+                'BS_mean_mfcc_3',
+                'BS_mean_mfcc_4',
+                'BS_mean_mfcc_5',
+                'BS_mean_mfcc_7',
+                'BS_mean_mfcc_8',
+                'BS_mean_mfcc_9',
+                'BS_mean_mfcc_10',
+                'BS_mean_mfcc_11',
+                'BS_mean_centroid',
+                ]
 
-visual_sample = ['mean_mfcc_3',
-                'mean_mfcc_4',
-                'mean_mfcc_5',
-                'mean_mfcc_7',
-                'mean_mfcc_8']
+clinical_features = [
+    'age',
+    'male',
+    'female',
+    'thorax_circ',
+    'height',
+    'weight',
+    # 'smoking_packs',
+
+    # 'temp',
+    # 'bp_systolic',
+    # 'bp_diastolic',
+    # 'hr',
+    # 'rr',
+    # 'sp02',
+    # 'peak_flow',
+    # 'sob',
+    # 'wheezing'
+]
+
+# freq_features = audio_features + clinical_features
+
+visual_sample = ['PS_mean_mfcc_5',
+                'PS_mean_mfcc_8']
 
 
 #What follows is a set of parameters for figue output.
@@ -131,8 +166,8 @@ class Analysis():
 
         pca = PCA(n_components = n_comp)
         pca.fit(df)
-        print("Explained variance by principle components")
-        print(pca.explained_variance_ratio_)
+        # print("Explained variance by principle components")
+        # print(pca.explained_variance_ratio_)
         self.models['pca'] = pca
 
     #this trains a knn for the analysis.
@@ -251,7 +286,7 @@ class Analysis():
                                 s = 240/len(features), alpha=0.75)
 
                  #INSERT INDIVIDUAL SUBPLOT FEATURES HERE
-                 
+
                 #Add the tick marks and labels only for the graphs
                 #that are on the edges
                 if jj == 0:
@@ -285,20 +320,30 @@ class Analysis():
 def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/features.csv',
                 path_out = '/Users/samuelzetumer/Desktop/tabla-master/analysis/',
                 class_id = 'lung_disease',
-                features = freq_features,
                 n_comp_pca = 4,
                 k_neighbors = 5,
                 visual_features = visual_sample,
                 visual_file_1 = 'viz1.png',
+                include_bs = False,
+                include_ps = False,
+                include_clinical = False,
                 g1_parameters = g1_params_default,
                 g2_parameters = g1_params_default):
+
+    features = []
+    if include_ps:
+        features = features + ps_audio_features
+    if include_bs:
+        features = features + bs_audio_features
+    if include_clinical:
+        features = features + clinical_features
 
     df = pd.read_csv(file_in)
     a1 = Analysis(data = df, class_id = class_id)
 
     a1.add_pca(features = features, n_comp = n_comp_pca)
 
-    a1.train_knn(features = freq_features, k_neighbors = k_neighbors)
+    a1.train_knn(features = features, k_neighbors = k_neighbors)
 
     #pca
     reduced = a1.models['pca'].fit_transform(df.loc[:,features])
@@ -316,6 +361,12 @@ def run_analysis(file_in = '/Users/samuelzetumer/Desktop/tabla-master/features/f
     knn_cols = ['{0}_knn_vote'.format(str(i)) for i in df.loc[:,class_id].unique()]
     knn_df = pd.DataFrame(knn_results, columns = knn_cols)
     knn_score = a1.models['knn'].score(df.loc[:,features],df.loc[:,class_id])
+    print 'BS: %r. PS: %r. Clinical: %r' % (include_bs, include_ps, include_clinical)
+    print 'neighbors: %d. Accuracy: %f' % (k_neighbors, knn_score)
+    print ''
+    return
+    #print knn_score
+    #return
 
     #now knn on pca'ed coordinates
     df2 = pd.concat([pd.DataFrame(reduced_df), df.loc[:,class_id]], axis=1)

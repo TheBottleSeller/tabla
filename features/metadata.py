@@ -26,7 +26,6 @@ def process_metadata(patient_data_path, output_path):
         'PNA005',
         'PNA006',
         'PNA007',
-        'ED008',
     ]
 
     def default_thorax_circ(gender):
@@ -60,6 +59,12 @@ def process_metadata(patient_data_path, output_path):
             return np.array([])
         processed_row = np.append(processed_row, 1 if gender == 'M' else 0)
         processed_row = np.append(processed_row, 1 if gender == 'F' else 0)
+
+        height = row_data[5]
+        processed_row = np.append(processed_row, height)
+
+        weight = row_data[6]
+        processed_row = np.append(processed_row, weight)
 
         thorax_circ = to_float(row_data[7])
         if not isinstance(thorax_circ, float):
@@ -137,7 +142,7 @@ def process_metadata(patient_data_path, output_path):
 
     [rows, cols] = patient_data.shape
 
-    headers = ['id', 'age', 'male', 'female', 'thorax_circ', 'smoking_packs', 'temp', 'bp_systolic', 'bp_diastolic', 'hr', 'rr', 'sp02', 'peak_flow', 'sob', 'wheezing', 'lung_disease']
+    headers = ['id', 'age', 'male', 'female', 'height', 'weight', 'thorax_circ', 'smoking_packs', 'temp', 'bp_systolic', 'bp_diastolic', 'hr', 'rr', 'sp02', 'peak_flow', 'sob', 'wheezing', 'lung_disease']
 
     output_data = np.array([])
     for row_index in range(2, rows):

@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+sys.path.append('../essentia/src/python/essentia')
 import essentia.standard as ess
 
 M = 1024
@@ -13,15 +15,25 @@ fs = 4000
 def get_features(patient_dir):
 	ps_recordings = [file for file in os.listdir("%s/PS" % patient_dir) if file.endswith(".wav")]
 	ps_features = []
-	headers = []
+	ps_headers = []
 	for recording in ps_recordings:
-		hs, features = _get_features("%s/PS/%s" % (patient_dir, recording))
-		headers = hs
+		hs, features = _get_features("%s/PS/%s" % (patient_dir, recording), "PS")
+		ps_headers = hs
 		ps_features.append(features)
-	average_ps_features = np.mean(ps_features, axis=0)
-	return headers, average_ps_features.tolist()
+	average_ps_features = np.mean(ps_features, axis=0).tolist()
 
-def _get_features(audio_path):
+	bs_recordings = [file for file in os.listdir("%s/BS" % patient_dir) if file.endswith(".wav")]
+	bs_features = []
+	bs_headers = []
+	for recording in bs_recordings:
+		hs, features = _get_features("%s/BS/%s" % (patient_dir, recording), "BS")
+		bs_headers = hs
+		bs_features.append(features)
+	average_bs_features = np.mean(bs_features, axis=0).tolist()
+
+	return ps_headers + bs_headers, average_ps_features + average_bs_features
+
+def _get_features(audio_path, recording_type):
 	spectrum = ess.Spectrum(size=N)
 	window = ess.Windowing(size=M, type='hann')
 	mfcc = ess.MFCC(numberCoefficients = 12)
@@ -38,7 +50,7 @@ def _get_features(audio_path):
 	features = []
 	for i in range(0, 12):
 		coefficients = mfccs[:,i]
-		headers.append('mean_mfcc_%d' % i)
+		headers.append('%s_mean_mfcc_%d' % (recording_type, i))
 		features.append(np.mean(coefficients))
 
 	# plt.figure(1, figsize=(9.5, 7))

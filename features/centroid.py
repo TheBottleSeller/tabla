@@ -12,30 +12,35 @@ fs = 4000
 # Calculate the centroid for each PS recording
 # Average all the centroid results across the ps recordings
 def get_features(patient_dir):
-	ps_recordings = [file for file in os.listdir("%s/PS" % patient_dir) if file.endswith(".wav")]
-	ps_features = []
-	headers = []
-	for recording in ps_recordings:
-		hs, features = _get_features("%s/PS/%s" % (patient_dir, recording))
-		headers = hs
-		ps_features.append(features)
-	average_ps_features = np.mean(ps_features, axis=0)
-	return headers, average_ps_features.tolist()
+	h1, f1 = get_features_for_type(patient_dir, 'PS')
+	h2, f2 = get_features_for_type(patient_dir, 'BS')
+	return h1 + h2, f1 + f2
 
-def _get_features(audio_path):
+def get_features_for_type(patient_dir, recording_type):
+	recordings = [file for file in os.listdir("%s/%s" % (patient_dir, recording_type)) if file.endswith(".wav")]
+	features = []
+	headers = []
+	for recording in recordings:
+		hs, f = _get_features("%s/%s/%s" % (patient_dir, recording_type, recording), recording_type)
+		headers = hs
+		features.append(f)
+	average_features = np.mean(features, axis=0)
+	return headers, average_features.tolist()
+
+def _get_features(audio_path, recording_type):
 	spectrum = ess.Spectrum(size=N)
 	window = ess.Windowing(size=M, type='hann')
 	centroid = ess.Centroid(range=1)
 	x = ess.MonoLoader(filename=audio_path, sampleRate = fs)()
 	spectrumcentroid = []
 
-	for frame in ess.FrameGenerator(x, frameSize=M, hopSize=H, startFromZero=True):          
+	for frame in ess.FrameGenerator(x, frameSize=M, hopSize=H, startFromZero=True):
 	  mX = spectrum(window(frame))
 	  centroidvalues = centroid(mX)
-	  spectrumcentroid.append(centroidvalues)            
+	  spectrumcentroid.append(centroidvalues)
 	spectrumcentroid = np.array(spectrumcentroid)
 
-	headers = ['mean_centroid']
+	headers = ['%s_mean_centroid' % recording_type]
 	features = [np.mean(spectrumcentroid)]
 	#[np.mean(centroid)]
 
