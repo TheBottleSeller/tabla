@@ -73,7 +73,7 @@ if adamMakeThisFalseIfFalse:
     audio_features = pd.read_csv(audio_features_path)
     audio_features.drop('id', axis=1, inplace=True)
     audio_features.to_csv(full_features_path, index=False)
-    return
+    sys.exit(0)
 
 # Merge audio and metadata features
 audio_features = pd.read_csv(audio_features_path)
