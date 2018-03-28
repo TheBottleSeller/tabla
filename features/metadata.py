@@ -19,13 +19,13 @@ def process_metadata(patient_data_path, output_path):
     DEFAULT_RR = 18
 
     KNOWN_BAD_IDS = [
-        'PNA001',
-        'PNA002',
-        'PNA003',
-        'PNA004',
-        'PNA005',
-        'PNA006',
-        'PNA007',
+        # 'PNA001',
+        # 'PNA002',
+        # 'PNA003',
+        # 'PNA004',
+        # 'PNA005',
+        # 'PNA006',
+        # 'PNA007',
     ]
 
     def default_thorax_circ(gender):

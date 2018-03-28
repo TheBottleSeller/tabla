@@ -51,18 +51,29 @@ def get_patient_ids(path, study):
     return patient_ids
 
 
-# file = open(audio_features_path, "w")
-# create_header=True
-# for patient_id in get_patient_ids('%s/healthy' % in_root, 'HA'):
-#     write_features(file, patient_id, '%s/healthy/%s' % (in_root, patient_id), create_header)
-#     if create_header:
-#         create_header=False
-#
+file = open(audio_features_path, "w")
+create_header=True
+for patient_id in get_patient_ids('%s/healthy' % in_root, 'HA'):
+    write_features(file, patient_id, '%s/healthy/%s' % (in_root, patient_id), create_header)
+    if create_header:
+        create_header=False
+
 # for patient_id in get_patient_ids('%s/ed' % in_root, 'ED'):
 #     write_features(file, patient_id, '%s/ed/%s' % (in_root, patient_id), create_header)
 
+for patient_id in get_patient_ids('%s/pna' % in_root, 'PNA'):
+    write_features(file, patient_id, '%s/pna/%s' % (in_root, patient_id), create_header)
+
 # Process metadata
 metadata.process_metadata(metadata_path, metadata_features_path)
+
+adamMakeThisFalseIfFails = True
+
+if adamMakeThisFalseIfFalse:
+    audio_features = pd.read_csv(audio_features_path)
+    audio_features.drop('id', axis=1, inplace=True)
+    audio_features.to_csv(full_features_path, index=False)
+    return
 
 # Merge audio and metadata features
 audio_features = pd.read_csv(audio_features_path)
