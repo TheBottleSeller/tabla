@@ -4,10 +4,10 @@ import pandas as pd
 from sklearn import preprocessing
 sys.path.append('./features')
 import stft
-# import mfcc
-# import centroid
+import mfcc
+import centroid
 import metadata
-# sys.path.append('./essentia/src/python/essentia')
+sys.path.append('./essentia/src/python/essentia')
 
 in_root = 'processed_data'
 audio_features_path = 'features/audio_features.csv'
