@@ -69,7 +69,7 @@ metadata.process_metadata(metadata_path, metadata_features_path)
 
 adamMakeThisFalseIfFails = True
 
-if adamMakeThisFalseIfFalse:
+if adamMakeThisFalseIfFails:
     audio_features = pd.read_csv(audio_features_path)
     audio_features.drop('id', axis=1, inplace=True)
     audio_features.to_csv(full_features_path, index=False)
