@@ -69,20 +69,24 @@ metadata.process_metadata(metadata_path, metadata_features_path)
 
 adamMakeThisFalseIfFails = True
 
-if adamMakeThisFalseIfFails:
-    audio_features = pd.read_csv(audio_features_path)
-    audio_features.drop('id', axis=1, inplace=True)
-    audio_features.to_csv(full_features_path, index=False)
-    sys.exit(0)
-
-# Merge audio and metadata features
 audio_features = pd.read_csv(audio_features_path)
-metadata_features = pd.read_csv(metadata_features_path)
+audio_features.drop('id', axis=1, inplace=True)
+audio_features.to_csv(full_features_path, index=False)
 
-all_features = metadata_features.merge(audio_features, on='id', how="inner")
-all_features.drop('id', axis=1, inplace=True)
-all_features.drop(all_features.columns[len(all_features.columns)-1], axis=1, inplace=True)
-all_features.to_csv(full_features_path, index=False)
+# if adamMakeThisFalseIfFails:
+#     audio_features = pd.read_csv(audio_features_path)
+#     audio_features.drop('id', axis=1, inplace=True)
+#     audio_features.to_csv(full_features_path, index=False)
+#     sys.exit(0)
+#
+# # Merge audio and metadata features
+# audio_features = pd.read_csv(audio_features_path)
+# metadata_features = pd.read_csv(metadata_features_path)
+#
+# all_features = metadata_features.merge(audio_features, on='id', how="inner")
+# all_features.drop('id', axis=1, inplace=True)
+# all_features.drop(all_features.columns[len(all_features.columns)-1], axis=1, inplace=True)
+# all_features.to_csv(full_features_path, index=False)
 
 # Normalize features
 # min_max_scaler = preprocessing.MinMaxScaler()
