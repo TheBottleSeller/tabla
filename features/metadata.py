@@ -56,7 +56,7 @@ def process_metadata(patient_data_path, output_path):
         gender = row_data[3]
         if gender != 'M' and gender != 'F':
             print 'Row %d: Bad gender: %s' % (index, gender)
-            return np.array([])
+            gender = 'M'
         processed_row = np.append(processed_row, 1 if gender == 'M' else 0)
         processed_row = np.append(processed_row, 1 if gender == 'F' else 0)
 
